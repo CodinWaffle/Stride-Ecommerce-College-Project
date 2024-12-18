@@ -51,12 +51,15 @@ A comprehensive e-commerce platform built with Flask, featuring a robust seller 
   - Image galleries
   - Size and variant selection
   - Stock availability
+![product details](https://github.com/user-attachments/assets/771993fa-1667-45ee-929c-340af24f70d4)
 
 ## 7. Review System
   - Product ratings and reviews
   - Media upload support
   - Seller responses
   - Rating analytics
+![review](https://github.com/user-attachments/assets/1343b5d4-6949-482a-bad4-0cdc01ddfd5c)
+![customer review](https://github.com/user-attachments/assets/9c098814-7477-4677-8265-353dddd7c951)
 
 ## 8. Admin Panel
 - User management
