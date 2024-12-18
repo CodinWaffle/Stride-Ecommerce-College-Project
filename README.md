@@ -1,4 +1,4 @@
-# 👟Stride👟(Ecommerce-Project)
+# 👟Stride👟(Ecommerce-College Project)
 
 ## Overview
 A comprehensive e-commerce platform built with Flask, featuring a robust seller marketplace, secure payment processing, and an intuitive user interface.
