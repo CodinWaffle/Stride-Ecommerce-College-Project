@@ -80,7 +80,7 @@ A comprehensive e-commerce platform built with Flask, featuring a robust seller 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ecommerce-platform.git
+git clone https://github.com/CodinWaffle/Stride.git
 
 # Install dependencies
 pip install -r requirements.txt
