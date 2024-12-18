@@ -2,18 +2,18 @@
 
 ## Overview
 A comprehensive e-commerce platform built with Flask, featuring a robust seller marketplace, secure payment processing, and an intuitive user interface.
-![Homepage](https://github.com/user-attachments/assets/5821aae8-55de-43d3-b3c7-45e8c960c960)
+![Homepage](https://github.com/user-attachments/assets/2650a4ec-3e3f-4fd0-b555-607af608055a)
 ## Features
 ## 1. User Management
   - Secure authentication system
   - Role-based access control (Admin, Seller, Customer)
   - Profile management with customizable avatars
   - Secure platform with verified seller badges
-![forgot pass](https://github.com/user-attachments/assets/db77d8a9-34c2-4226-b51a-771cb291f8fe)
-![OTP](https://github.com/user-attachments/assets/c78ff059-d93a-4c67-b521-69cffedf9ab5)
-![sign in](https://github.com/user-attachments/assets/7885c204-ee57-4803-bdf7-7837115ced5f)
-![sign up](https://github.com/user-attachments/assets/7f57eca7-b103-4e31-a5ec-0bb620104d97)
-![profile](https://github.com/user-attachments/assets/c32c70fd-ceed-4ca0-a51e-d05531ed25ba)
+![forgot pass](https://github.com/user-attachments/assets/cab69425-39b1-4f20-bcb3-578dd31632c9)
+![OTP](https://github.com/user-attachments/assets/d8e0fe6a-0c1a-40e4-8ef6-960560b08350)
+![sign in](https://github.com/user-attachments/assets/8550842e-d194-4cbe-a450-7ef78021eaec)
+![sign up](https://github.com/user-attachments/assets/17ec99d1-dca6-4716-971f-c4d2b58e3676)
+![profile](https://github.com/user-attachments/assets/c182c06d-cde6-474f-8fcf-77a5317d73ea)
 
 ## 2. Product Management
   - Product creation and editing
