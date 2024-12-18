@@ -10,8 +10,8 @@ import traceback
 
 # Initialize Google blueprint
 blueprint = make_google_blueprint(
-    client_id="613902590773-mo0fe3hkjtuegahano3ssuon5olk5gcj.apps.googleusercontent.com",
-    client_secret="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",
+    client_id="your_client_id",
+    client_secret="your_client_secret",
     scope=["profile", "email"],
     offline=True,
     redirect_url="/login/google/callback"

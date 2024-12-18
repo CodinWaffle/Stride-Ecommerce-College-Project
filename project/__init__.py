@@ -45,8 +45,8 @@ def create_app():
     app = Flask(__name__)
 
     # Basic configuration
-    app.config['SECRET_KEY'] = '60976a5747100e32f8206121d5aefa5f'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:@localhost:3306/stride_db'
+    app.config['SECRET_KEY'] = 'your_secret_key'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:@localhost:3306/Your database_name '
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # Configure upload paths
