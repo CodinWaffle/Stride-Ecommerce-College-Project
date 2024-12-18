@@ -110,8 +110,8 @@ def create_app():
         app.logger.addHandler(mail_handler)
     
     # OAuth configuration
-    app.config['GOOGLE_OAUTH_CLIENT_ID'] = "613902590773-mo0fe3hkjtuegahano3ssuon5olk5gcj.apps.googleusercontent.com"
-    app.config['GOOGLE_OAUTH_CLIENT_SECRET'] = "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"
+    app.config['GOOGLE_OAUTH_CLIENT_ID'] = "your client_ID"
+    app.config['GOOGLE_OAUTH_CLIENT_SECRET'] = "your Client secret"
     app.config['OAUTHLIB_INSECURE_TRANSPORT'] = True
     app.config['OAUTHLIB_RELAX_TOKEN_SCOPE'] = True
     app.config['SESSION_COOKIE_SECURE'] = False
