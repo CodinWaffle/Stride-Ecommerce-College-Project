@@ -2,7 +2,7 @@
 
 ## Overview
 A comprehensive e-commerce platform built with Flask, featuring a robust seller marketplace, secure payment processing, and an intuitive user interface.
-
+![Homepage](https://github.com/user-attachments/assets/5821aae8-55de-43d3-b3c7-45e8c960c960)
 ## Features
 ## 1. User Management
   - Secure authentication system
