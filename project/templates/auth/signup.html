@@ -1,0 +1,543 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="container-fluid min-vh-100 d-flex align-items-center py-5" style="background-color: #f8f9fa;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <div class="card border-0 shadow-lg rounded-4 overflow-hidden slide-in-right">
+                        <div class="row g-0">
+                            <!-- Left side - Image/Welcome -->
+                            <div class="col-lg-5 d-none d-lg-block auth-left slide-in-left" style="background: #9370DB;">
+                                <div class="d-flex flex-column justify-content-center h-100 p-5 text-white">
+                                    <h2 class="fw-bold mb-3 fade-in">Join Stride Today!</h2>
+                                    <p class="lead mb-4 fade-in delay-1">Create your account and start your journey with us.</p>
+                                    <div class="features fade-in delay-2">
+                                        <div class="feature-item slide-in-left delay-3">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-shopping-bag fs-4 me-2"></i>
+                                                <span>Shop with Confidence</span>
+                                            </div>
+                                        </div>
+                                        <div class="feature-item slide-in-left delay-4">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-store fs-4 me-2"></i>
+                                                <span>Start Selling</span>
+                                            </div>
+                                        </div>
+                                        <div class="feature-item slide-in-left delay-5">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-shield-alt fs-4 me-2"></i>
+                                                <span>Secure Platform</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right side - Form -->
+                            <div class="col-lg-7 auth-right slide-in-right">
+                                <div class="card-body p-4 p-lg-5">
+                                    <div class="text-center mb-4 fade-in">
+                                        <h3 class="fw-bold">Create Account</h3>
+                                        <p class="text-muted">Fill in your details to get started</p>
+                                    </div>
+
+                                    <form method="POST" enctype="multipart/form-data" class="needs-validation fade-in delay-1" novalidate>
+                                        {{ form.hidden_tag() }}
+                                        
+                                        <!-- Basic Information -->
+                                        <div class="mb-4">
+                                            <div class="form-floating mb-3">
+                                                {{ form.username(class="form-control custom-input", placeholder="Username") }}
+                                                <label for="username">
+                                                    <i class="fas fa-user me-2"></i>Username
+                                                </label>
+                                                {% if form.username.errors %}
+                                                    <div class="invalid-feedback d-block">
+                                                        {{ form.username.errors[0] }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="form-floating mb-3">
+                                                {{ form.email(class="form-control custom-input", placeholder="Email") }}
+                                                <label for="email">
+                                                    <i class="fas fa-envelope me-2"></i>Email
+                                                </label>
+                                                {% if form.email.errors %}
+                                                    <div class="invalid-feedback d-block">
+                                                        {{ form.email.errors[0] }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="row g-3 mb-3">
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        {{ form.phone(class="form-control custom-input", placeholder="Phone") }}
+                                                        <label for="phone">
+                                                            <i class="fas fa-phone me-2"></i>Phone
+                                                        </label>
+                                                        {% if form.phone.errors %}
+                                                            <div class="invalid-feedback d-block">
+                                                                {{ form.phone.errors[0] }}
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        {{ form.address(class="form-control custom-input", placeholder="Address") }}
+                                                        <label for="address">
+                                                            <i class="fas fa-map-marker-alt me-2"></i>Address
+                                                        </label>
+                                                        {% if form.address.errors %}
+                                                            <div class="invalid-feedback d-block">
+                                                                {{ form.address.errors[0] }}
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row g-3 mb-3">
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        {{ form.password(class="form-control custom-input", placeholder="Password") }}
+                                                        <label for="password">
+                                                            <i class="fas fa-lock me-2"></i>Password
+                                                        </label>
+                                                        {% if form.password.errors %}
+                                                            <div class="invalid-feedback d-block">
+                                                                {{ form.password.errors[0] }}
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        {{ form.confirm_password(class="form-control custom-input", placeholder="Confirm Password") }}
+                                                        <label for="confirm_password">
+                                                            <i class="fas fa-lock me-2"></i>Confirm
+                                                        </label>
+                                                        {% if form.confirm_password.errors %}
+                                                            <div class="invalid-feedback d-block">
+                                                                {{ form.confirm_password.errors[0] }}
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Seller Option -->
+                                        <div class="form-check form-switch mb-4">
+                                            {{ form.is_seller(class="form-check-input custom-switch", onchange="toggleSellerFields(this)") }}
+                                            <label class="form-check-label d-flex align-items-center gap-2" for="is_seller">
+                                                <i class="fas fa-store text-primary"></i>
+                                                <span>Register as a Seller</span>
+                                            </label>
+                                        </div>
+
+                                        <!-- Seller Fields (initially hidden) -->
+                                        <div id="sellerFields" style="display: none;">
+                                            <!-- Profile Image Upload -->
+                                            <div class="text-center mb-4">
+                                                <div class="position-relative d-inline-block">
+                                                    <div class="profile-image-container">
+                                                        <img id="profilePreview" 
+                                                             src="{{ url_for('static', filename='img/placeholder-profile.jpg') }}" 
+                                                             class="rounded-circle border"
+                                                             width="120" 
+                                                             height="120"
+                                                             style="object-fit: cover;">
+                                                        <div class="profile-image-overlay">
+                                                            <i class="fas fa-camera"></i>
+                                                        </div>
+                                                    </div>
+                                                    <label for="profile_image" class="upload-button">
+                                                        <i class="fas fa-camera"></i>
+                                                    </label>
+                                                    {{ form.profile_image(class="d-none", onchange="previewImage(this)") }}
+                                                </div>
+                                                <p class="text-muted mt-2 small">Click to upload profile picture</p>
+                                            </div>
+
+                                            <!-- Store Information -->
+                                            <div class="mb-4">
+                                                <div class="form-floating mb-3">
+                                                    {{ form.store_name(class="form-control custom-input", placeholder="Store Name") }}
+                                                    <label for="store_name">
+                                                        <i class="fas fa-store me-2"></i>Store Name
+                                                    </label>
+                                                    {% if form.store_name.errors %}
+                                                        <div class="invalid-feedback d-block">
+                                                            {{ form.store_name.errors[0] }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+
+                                                <div class="form-floating mb-3">
+                                                    {{ form.store_description(class="form-control custom-input", style="height: 100px", placeholder="Store Description") }}
+                                                    <label for="store_description">
+                                                        <i class="fas fa-align-left me-2"></i>Store Description
+                                                    </label>
+                                                    {% if form.store_description.errors %}
+                                                        <div class="invalid-feedback d-block">
+                                                            {{ form.store_description.errors[0] }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+
+                                                <div class="form-floating mb-3">
+                                                    {{ form.business_type(class="form-select custom-input", placeholder="Business Type") }}
+                                                    <label for="business_type">
+                                                        <i class="fas fa-building me-2"></i>Business Type
+                                                    </label>
+                                                    {% if form.business_type.errors %}
+                                                        <div class="invalid-feedback d-block">
+                                                            {{ form.business_type.errors[0] }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+
+                                                <div class="form-floating mb-3">
+                                                    {{ form.business_address(class="form-control custom-input", placeholder="Business Address") }}
+                                                    <label for="business_address">
+                                                        <i class="fas fa-map-marker-alt me-2"></i>Business Address
+                                                    </label>
+                                                    {% if form.business_address.errors %}
+                                                        <div class="invalid-feedback d-block">
+                                                            {{ form.business_address.errors[0] }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <div class="form-floating">
+                                                            {{ form.business_email(class="form-control custom-input", placeholder="Business Email") }}
+                                                            <label for="business_email">
+                                                                <i class="fas fa-envelope me-2"></i>Business Email
+                                                            </label>
+                                                            {% if form.business_email.errors %}
+                                                                <div class="invalid-feedback d-block">
+                                                                    {{ form.business_email.errors[0] }}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-floating">
+                                                            {{ form.tax_id(class="form-control custom-input", placeholder="Tax ID") }}
+                                                            <label for="tax_id">
+                                                                <i class="fas fa-file-alt me-2"></i>Tax ID
+                                                            </label>
+                                                            {% if form.tax_id.errors %}
+                                                                <div class="invalid-feedback d-block">
+                                                                    {{ form.tax_id.errors[0] }}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary w-100 py-3 mb-4 rounded-3">
+                                            <i class="fas fa-user-plus me-2"></i>Create Account
+                                        </button>
+
+                                        <p class="text-center text-muted mb-0">
+                                            Already have an account? 
+                                            <a href="{{ url_for('auth.login') }}" class="text-decoration-none text-primary page-transition">Sign In</a>
+                                        </p>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Base Styles */
+.auth-wrapper {
+    perspective: 1000px;
+}
+
+.card {
+    transform-style: preserve-3d;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Animation Classes */
+.slide-in-right {
+    animation: slideInRight 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards;
+}
+
+/* Delays */
+.delay-1 { animation-delay: 0.2s; }
+.delay-2 { animation-delay: 0.4s; }
+.delay-3 { animation-delay: 0.6s; }
+.delay-4 { animation-delay: 0.8s; }
+.delay-5 { animation-delay: 1s; }
+
+/* Page Transition */
+.page-transition {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.page-transition::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background: #9370DB;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.page-transition:hover::after {
+    transform: scaleX(1);
+}
+
+/* Keyframes */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Input and Button Styles */
+.custom-input {
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.custom-input:focus {
+    border-color: #9370DB;
+    box-shadow: 0 0 0 0.2rem rgba(147, 112, 219, 0.25);
+    transform: translateY(-1px);
+}
+
+.custom-input:hover {
+    border-color: #9370DB;
+    transform: translateY(-1px);
+}
+
+/* Form Switch */
+.form-switch {
+    padding-left: 3em;
+}
+
+.form-switch .form-check-input {
+    width: 3em;
+    margin-left: -3em;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%28255, 255, 255, 1%29'/%3e%3c/svg%3e");
+    background-color: #e9ecef;
+    border-color: #e9ecef;
+}
+
+.form-switch .form-check-input:checked {
+    background-color: #9370DB;
+    border-color: #9370DB;
+}
+
+.form-switch .form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(147, 112, 219, 0.25);
+}
+
+/* Profile Image Upload */
+.profile-image-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.profile-image-container:hover .profile-image-overlay {
+    opacity: 1;
+}
+
+.profile-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.profile-image-overlay i {
+    color: white;
+    font-size: 1.5rem;
+}
+
+.upload-button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 32px;
+    height: 32px;
+    background: #9370DB;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid white;
+}
+
+.upload-button:hover {
+    background: #8250df;
+    transform: scale(1.1);
+}
+
+/* Left Side Features */
+.feature-item {
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards;
+}
+
+.feature-item i {
+    opacity: 0.9;
+}
+
+/* Button Styles */
+.btn-primary {
+    background: #9370DB;
+    border: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: #8250df;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(147, 112, 219, 0.25);
+}
+
+.btn-outline-secondary {
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+    background: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Invalid Feedback */
+.invalid-feedback {
+    font-size: 0.875rem;
+    color: #dc3545;
+    margin-top: 0.25rem;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .auth-left {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 2rem !important;
+    }
+    
+    .row.g-3 {
+        gap: 1rem !important;
+    }
+}
+</style>
+
+<script>
+function toggleSellerFields(checkbox) {
+    const sellerFields = document.getElementById('sellerFields');
+    if (checkbox.checked) {
+        sellerFields.style.display = 'block';
+        sellerFields.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+        sellerFields.style.display = 'none';
+    }
+}
+
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('profilePreview').src = e.target.result;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Show seller fields if checkbox is checked (e.g., after form validation error)
+document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('is_seller');
+    if (checkbox.checked) {
+        toggleSellerFields(checkbox);
+    }
+});
+</script>
+{% endblock %}

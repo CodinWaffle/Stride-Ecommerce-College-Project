@@ -1,0 +1,1309 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="order-header mb-4">
+        <div class="header-content rounded-4 bg-gradient p-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                <div class="header-text">
+                    <h3 class="text-white fw-bold mb-2">My Orders</h3>
+                    <p class="text-white-50 mb-0">Track and manage your purchase history</p>
+                </div>
+                <a href="{{ url_for('main.shop') }}" class="btn btn-light rounded-pill px-4">
+                    <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Status Tabs -->
+    <div class="order-tabs mb-4">
+        <div class="nav-container bg-white rounded-4 shadow-sm p-2">
+            <ul class="nav nav-pills nav-fill flex-nowrap overflow-auto">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.args.get('status', 'all') == 'all' %}active{% endif %}" 
+                       href="{{ url_for('main.orders', status='all') }}">
+                        <i class="fas fa-list-ul me-2"></i>All Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.args.get('status') == 'pending' %}active{% endif %}"
+                       href="{{ url_for('main.orders', status='pending') }}">
+                        <i class="fas fa-wallet me-2"></i>To Pay
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.args.get('status') == 'processing' %}active{% endif %}"
+                       href="{{ url_for('main.orders', status='processing') }}">
+                        <i class="fas fa-box me-2"></i>To Ship
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.args.get('status') == 'shipped' %}active{% endif %}"
+                       href="{{ url_for('main.orders', status='shipped') }}">
+                        <i class="fas fa-truck me-2"></i>To Receive
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.args.get('status') == 'delivered' %}active{% endif %}"
+                       href="{{ url_for('main.orders', status='delivered') }}">
+                        <i class="fas fa-check-circle me-2"></i>Completed
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.args.get('status') == 'cancelled' %}active{% endif %}"
+                       href="{{ url_for('main.orders', status='cancelled') }}">
+                        <i class="fas fa-times-circle me-2"></i>Cancelled
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    {% if orders %}
+    <!-- Orders List -->
+    {% for order in orders %}
+    <div class="card shadow-sm rounded-4 mb-4 border-0 order-card">
+        <div class="card-header bg-white py-3 px-4 border-bottom border-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div>
+                        <span class="fw-bold d-block">Order #{{ order.id }}</span>
+                        <small class="text-muted">{{ order.items|length }} item{% if order.items|length != 1 %}s{% endif %}</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-{{ order_status_colors[order.status] }}-subtle text-{{ order_status_colors[order.status] }} rounded-pill px-3 py-2">
+                        <i class="fas fa-circle me-1" style="font-size: 8px;"></i>
+                        {{ order.status.title() }}
+                    </span>
+                    {% if order.tracking_number %}
+                    <a href="{{ url_for('main.track_order', tracking_number=order.tracking_number) }}" 
+                       class="btn btn-light btn-sm rounded-pill">
+                        <i class="fas fa-truck me-2"></i>Track Order
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-body p-4">
+            <!-- Group items by seller -->
+            {% set sellers = {} %}
+            {% for item in order.items %}
+                {% if item.product and item.product.seller %}
+                    {% if item.product.seller.id not in sellers %}
+                        {% set _ = sellers.update({item.product.seller.id: {
+                            'seller': item.product.seller,
+                            'products': []
+                        }}) %}
+                    {% endif %}
+                    {% set _ = sellers[item.product.seller.id]['products'].append(item) %}
+                {% endif %}
+            {% endfor %}
+
+            <!-- Display items grouped by seller -->
+            {% for seller_id, data in sellers.items() %}
+            <div class="seller-group mb-4 {% if not loop.last %}border-bottom pb-4{% endif %}">
+                <!-- Seller Header -->
+                <div class="d-flex align-items-center mb-3">
+                    {% if data.seller.profile_image %}
+                        <img src="{{ url_for('static', filename=data.seller.profile_image) }}"
+                             class="profile-image me-3"
+                             alt="{{ data.seller.store_name }}">
+                    {% else %}
+                        <div class="store-icon me-3">
+                            <i class="fas fa-store"></i>
+                        </div>
+                    {% endif %}
+                    <div class="d-flex align-items-center gap-3 flex-grow-1">
+                        <span class="fw-bold">{{ data.seller.store_name }}</span>
+                        <a href="{{ url_for('product.seller_store', username=data.seller.username) }}" 
+                           class="btn btn-outline-primary btn-sm rounded-pill">
+                            Visit Store <i class="fas fa-external-link-alt ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Seller's Items -->
+                <div class="items-container">
+                    {% for item in data.products %}
+                    <div class="order-item d-flex align-items-center py-3 {% if not loop.last %}border-bottom{% endif %}">
+                        <div class="flex-shrink-0 position-relative">
+                            {% if item.product and item.product.image_main %}
+                                <img src="{{ url_for('static', filename=item.product.image_main) }}" 
+                                     alt="{{ item.product.name }}"
+                                     class="product-image">
+                            {% else %}
+                                <div class="unavailable-product">
+                                    <i class="fas fa-image text-muted fa-2x"></i>
+                                </div>
+                            {% endif %}
+                            {% if not item.product %}
+                                <div class="unavailable-badge">
+                                    <span class="badge bg-danger-subtle text-danger">
+                                        <i class="fas fa-exclamation-circle me-1"></i>Unavailable
+                                    </span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1 ms-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="product-title mb-1">
+                                        {% if item.product %}
+                                            {{ item.product.name }}
+                                        {% else %}
+                                            <span class="text-muted">Product no longer available</span>
+                                        {% endif %}
+                                    </h6>
+                                    <div class="product-details">
+                                        <span class="badge bg-light text-dark me-2">
+                                            <i class="fas fa-box me-1"></i>Qty: {{ item.quantity }}
+                                        </span>
+                                        {% if item.size %}
+                                        <span class="badge bg-light text-dark">
+                                            <i class="fas fa-ruler me-1"></i>Size: {{ item.size }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    {% if item.product and item.price != item.product.price %}
+                                        <p class="price-display mb-0">
+                                            <small class="text-decoration-line-through text-muted me-2">₱{{ "%.2f"|format(item.product.price) }}</small>
+                                            <span class="current-price">₱{{ "%.2f"|format(item.price) }}</span>
+                                        </p>
+                                    {% else %}
+                                        <p class="current-price mb-0">₱{{ "%.2f"|format(item.price) }}</p>
+                                    {% endif %}
+                                    <p class="subtotal mt-1">
+                                        <small class="text-muted">Subtotal: </small>
+                                        <span class="fw-bold">₱{{ "%.2f"|format(item.price * item.quantity) }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            {% if order.status == 'delivered' and not item.reviewed and item.product %}
+                            <div class="mt-2">
+                                <button class="btn btn-sm btn-primary rounded-pill" 
+                                        onclick="showReviewModal('{{ order.id }}', '{{ item.product.id }}', '{{ item.product.name }}', '{{ item.product.image_main }}')">
+                                    <i class="fas fa-star me-2"></i>Write Review
+                                </button>
+                            </div>
+                            {% elif order.status == 'delivered' and item.reviewed and item.product %}
+                            <div class="mt-2">
+                                <button class="btn btn-sm btn-outline-success rounded-pill" disabled>
+                                    <i class="fas fa-check me-2"></i>Review Submitted
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Unavailable Items (if any) -->
+            {% set unavailable_items = [] %}
+            {% for item in order.items %}
+                {% if not item.product or not item.product.seller %}
+                    {% set _ = unavailable_items.append(item) %}
+                {% endif %}
+            {% endfor %}
+
+            {% if unavailable_items %}
+            <div class="unavailable-items-group mt-4 pt-4 border-top">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="store-icon bg-danger bg-opacity-10 me-3">
+                        <i class="fas fa-exclamation-triangle text-danger"></i>
+                    </div>
+                    <span class="fw-bold text-danger">Unavailable Items</span>
+                </div>
+                {% for item in unavailable_items %}
+                <div class="order-item d-flex align-items-center py-3 {% if not loop.last %}border-bottom{% endif %}">
+                    <div class="flex-shrink-0">
+                        <div class="unavailable-product">
+                            <i class="fas fa-image text-muted fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-4">
+                        <h6 class="text-muted mb-1">Product no longer available</h6>
+                        <div class="product-details">
+                            <span class="badge bg-light text-dark me-2">
+                                <i class="fas fa-box me-1"></i>Qty: {{ item.quantity }}
+                            </span>
+                            {% if item.size %}
+                            <span class="badge bg-light text-dark">
+                                <i class="fas fa-ruler me-1"></i>Size: {{ item.size }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        <div class="text-end mt-2">
+                            <p class="current-price mb-0">₱{{ "%.2f"|format(item.price) }}</p>
+                            <p class="subtotal mt-1">
+                                <small class="text-muted">Subtotal: </small>
+                                <span class="fw-bold">₱{{ "%.2f"|format(item.price * item.quantity) }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card-footer bg-white py-3 px-4 border-top border-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center text-muted">
+                    <i class="far fa-calendar-alt me-2"></i>
+                    <span>Ordered on {{ order.created_at.strftime('%B %d, %Y') }}</span>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="text-end">
+                        <small class="text-muted d-block">Order Total</small>
+                        <span class="text-primary fw-bold fs-5">₱{{ "%.2f"|format(order.total) }}</span>
+                    </div>
+                    <div class="btn-group">
+                        {% if order.status == 'pending' %}
+                        <button class="btn btn-danger rounded-pill" onclick="cancelOrder('{{ order.id }}')">
+                            <i class="fas fa-times me-2"></i>Cancel Order
+                        </button>
+                        {% endif %}
+                        <button class="btn btn-light rounded-pill" onclick="showOrderDetails('{{ order.id }}')" type="button">
+                            <i class="fas fa-eye me-2"></i>View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+        <div class="empty-state-container bg-light rounded-4 p-5 mx-auto" style="max-width: 500px;">
+            <div class="empty-state-icon mb-4">
+                <i class="fas fa-shopping-bag fa-3x text-primary opacity-50"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-3">No Orders Yet</h5>
+            <p class="text-muted mb-4">Start shopping and your orders will appear here</p>
+            <a href="{{ url_for('main.shop') }}" class="btn btn-primary btn-lg rounded-pill">
+                <i class="fas fa-shopping-bag me-2"></i>Start Shopping
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+:root {
+    --purple-primary: #6f42c1;
+    --purple-secondary: #8250df;
+    --purple-light: #e9ecef;
+    --purple-hover: #563d7c;
+    --purple-subtle: #f3f0ff;
+}
+
+/* Base styles */
+.container {
+    max-width: 1200px;
+    padding: 1rem;
+}
+
+/* Navigation Pills */
+.nav-pills .nav-link {
+    color: #666;
+    background-color: transparent;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    padding: 0.75rem 1.25rem;
+    border-radius: 50rem;
+    white-space: nowrap;
+}
+
+.nav-pills .nav-link:hover:not(.active) {
+    background-color: rgba(147, 112, 219, 0.08);
+    color: #9370DB;
+}
+
+.nav-pills .nav-link.active {
+    background: linear-gradient(45deg, #9370DB, #8A2BE2);
+    box-shadow: 0 4px 15px rgba(147, 112, 219, 0.35);
+    transform: translateY(-1px);
+    color: white !important;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .nav-link.active i {
+    color: white !important;
+    opacity: 1;
+}
+
+.nav-pills .nav-link i {
+    opacity: 0.8;
+    margin-right: 0.5rem;
+    font-size: 0.9em;
+    color: inherit;
+}
+
+/* Nav Container */
+.nav-container {
+    background: white;
+    border-radius: 1rem;
+    padding: 0.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(147, 112, 219, 0.1);
+}
+
+.nav-pills {
+    gap: 0.5rem;
+}
+
+/* Responsive Scrolling for Tabs */
+.nav-pills.flex-nowrap {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    padding: 0.5rem;
+}
+
+.nav-pills.flex-nowrap::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+@media (max-width: 768px) {
+    .nav-container {
+        padding: 0.5rem !important;
+    }
+    
+    .nav-pills .nav-link {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .nav-pills .nav-link i {
+        margin-right: 0.35rem;
+        font-size: 0.85em;
+    }
+}
+
+/* Card styles */
+.order-card {
+    border: none;
+    box-shadow: 0 4px 12px rgba(111, 66, 193, 0.08);
+    margin-bottom: 1.5rem;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(111, 66, 193, 0.12);
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid var(--purple-light);
+}
+
+/* Profile Image and Store Icon */
+.profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(111, 66, 193, 0.15);
+}
+
+.store-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--purple-subtle);
+    box-shadow: 0 2px 8px rgba(111, 66, 193, 0.15);
+}
+
+.store-icon i {
+    font-size: 1.2rem;
+    color: var(--purple-primary);
+}
+
+/* Product Image */
+.product-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.order-item:hover .product-image {
+    transform: scale(1.05);
+}
+
+.unavailable-product {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Badges and Labels */
+.badge {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    border-radius: 50px;
+}
+
+.badge.bg-primary-subtle {
+    background-color: var(--purple-primary) !important;
+    color: white !important;
+}
+
+.product-details .badge {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--purple-primary) !important;
+    color: white !important;
+    border: 1px solid rgba(111, 66, 193, 0.2);
+    border-radius: 50px;
+}
+
+/* Status badges */
+.badge.bg-primary-subtle,
+.badge.bg-success-subtle,
+.badge.bg-warning-subtle,
+.badge.bg-danger-subtle,
+.badge.bg-info-subtle {
+    color: white !important;
+}
+
+.badge.bg-primary-subtle { background-color: var(--purple-primary) !important; }
+.badge.bg-success-subtle { background-color: #198754 !important; }
+.badge.bg-warning-subtle { background-color: #ffc107 !important; }
+.badge.bg-danger-subtle { background-color: #dc3545 !important; }
+.badge.bg-info-subtle { background-color: #0dcaf0 !important; }
+
+/* Buttons */
+.btn {
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--purple-primary);
+    border-color: var(--purple-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--purple-hover);
+    border-color: var(--purple-hover);
+    transform: translateY(-1px);
+}
+
+.btn-outline-primary {
+    color: var(--purple-primary);
+    border-color: var(--purple-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--purple-primary);
+    border-color: var(--purple-primary);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-light:hover {
+    background-color: var(--purple-subtle);
+    border-color: var(--purple-light);
+    transform: translateY(-1px);
+}
+
+/* Order Items */
+.order-item {
+    transition: all 0.3s ease;
+    padding: 1.5rem;
+    margin: 0 -1.5rem;
+    border-radius: 12px;
+}
+
+.order-item:hover {
+    background-color: var(--purple-subtle);
+}
+
+.product-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--purple-primary);
+    margin-bottom: 0.5rem;
+}
+
+.current-price {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--purple-primary);
+}
+
+.price-display small {
+    font-size: 0.9rem;
+}
+
+.subtotal {
+    font-size: 0.9rem;
+}
+
+/* Empty State */
+.empty-state-container {
+    background-color: var(--purple-subtle) !important;
+    border: 2px dashed var(--purple-primary);
+}
+
+.empty-state-icon {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Animations */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.order-card {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 0.5rem;
+    }
+
+    .order-card {
+        margin-bottom: 1rem;
+        border-radius: 12px;
+    }
+
+    .card-header, .card-body, .card-footer {
+        padding: 1rem;
+    }
+
+    .nav-pills {
+        overflow-x: auto;
+        white-space: nowrap;
+        flex-wrap: nowrap;
+        padding-bottom: 0.5rem;
+    }
+
+    .nav-pills .nav-item {
+        flex: 0 0 auto;
+    }
+
+    .nav-pills .nav-link {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .order-item {
+        padding: 1rem;
+        margin: 0 -1rem;
+    }
+
+    .product-image,
+    .unavailable-product {
+        width: 80px;
+        height: 80px;
+    }
+
+    .product-title {
+        font-size: 1rem;
+    }
+
+    .product-details .badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    .current-price {
+        font-size: 1.1rem;
+    }
+
+    .subtotal {
+        font-size: 0.8rem;
+    }
+
+    .btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Order Header Styles */
+.order-header {
+    margin-top: -1.5rem;
+}
+
+.header-content {
+    background: #9370DB;
+    box-shadow: 0 4px 20px rgba(147, 112, 219, 0.15);
+}
+
+.header-text h3 {
+    font-size: 1.75rem;
+    letter-spacing: -0.5px;
+}
+
+/* Order Tabs Styles */
+.order-tabs {
+    position: relative;
+    z-index: 1;
+}
+
+.nav-container {
+    border: 1px solid rgba(147, 112, 219, 0.1);
+}
+
+.nav-pills {
+    gap: 0.5rem;
+}
+
+.nav-pills .nav-link {
+    color: #666;
+    padding: 0.75rem 1.25rem;
+    border-radius: 50rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.nav-pills .nav-link:hover {
+    color: #9370DB;
+    background-color: rgba(147, 112, 219, 0.08);
+}
+
+.nav-pills .nav-link.active {
+    background-color: #9370DB;
+    color: white;
+}
+
+.nav-pills .nav-link i {
+    opacity: 0.8;
+}
+
+/* Responsive Scrolling for Tabs */
+.nav-pills.flex-nowrap {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.nav-pills.flex-nowrap::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        padding: 1.5rem !important;
+    }
+    
+    .nav-container {
+        padding: 0.5rem !important;
+    }
+    
+    .nav-pills .nav-link {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+</style>
+
+{% include 'product/order_details_modal.html' %}
+<script>
+function showOrderDetails(orderId) {
+    window.location.href = "{{ url_for('main.order_details', order_id=0) }}".replace('0', orderId);
+}
+
+function showReviewModal(orderId, productId, productName, productImage) {
+    // Reset form
+    const form = document.getElementById('reviewForm');
+    form.reset();
+    
+    // Set hidden input values
+    document.getElementById('productId').value = productId;
+    document.getElementById('orderId').value = orderId;
+    document.getElementById('selectedRating').value = '';
+    
+    // Set product info in the modal
+    const productImg = document.getElementById('reviewProductImage');
+    const productNameEl = document.getElementById('reviewProductName');
+    const orderIdEl = document.getElementById('reviewOrderId');
+    
+    if (productImg) productImg.src = productImage || '';
+    if (productNameEl) productNameEl.textContent = productName || '';
+    if (orderIdEl) orderIdEl.textContent = orderId || '';
+    
+    // Reset rating stars
+    document.querySelectorAll('.rating-stars i').forEach(star => {
+        star.classList.remove('active');
+    });
+    
+    // Clear media preview
+    const preview = document.getElementById('mediaPreview');
+    if (preview) {
+        preview.innerHTML = '';
+    }
+    document.getElementById('uploadPrompt').style.display = 'block';
+    
+    // Reset rating text
+    const ratingText = document.querySelector('.rating-text');
+    if (ratingText) {
+        ratingText.textContent = '';
+    }
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
+    modal.show();
+}
+
+function previewImages(input) {
+    const preview = document.getElementById('imagePreview');
+    preview.innerHTML = '';
+    
+    if (input.files) {
+        Array.from(input.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <img src="${e.target.result}" class="img-thumbnail" style="height: 100px;">
+                `;
+                preview.appendChild(div);
+            }
+            reader.readAsDataURL(file);
+        });
+    }
+}
+
+function validateReviewInputs(productId, orderId, rating, comment) {
+    if (!productId) {
+        showToast('error', 'Product ID is missing');
+        return false;
+    }
+    
+    if (!orderId) {
+        showToast('error', 'Order ID is missing');
+        return false;
+    }
+    
+    if (!rating) {
+        showToast('error', 'Please select a rating');
+        return false;
+    }
+    
+    if (!comment.trim()) {
+        showToast('error', 'Please write a review comment');
+        return false;
+    }
+    
+    return true;
+}
+
+function submitReview(event) {
+    event.preventDefault();
+    
+    // Get the form from the event target
+    const form = document.getElementById('reviewForm');
+    if (!form) {
+        console.error('Review form not found');
+        return;
+    }
+    
+    // Get form data
+    const productId = document.getElementById('productId').value;
+    const orderId = document.getElementById('orderId').value;
+    const rating = document.getElementById('selectedRating').value;
+    const comment = document.getElementById('reviewComment').value;
+    
+    // Validate inputs
+    if (!rating) {
+        alert('Please select a rating');
+        return;
+    }
+    
+    if (!comment.trim()) {
+        alert('Please write a review comment');
+        return;
+    }
+    
+    // Create FormData object
+    const formData = new FormData(form);
+    
+    // Add files if any
+    const mediaFiles = document.getElementById('reviewMedia')?.files;
+    if (mediaFiles && mediaFiles.length > 0) {
+        Array.from(mediaFiles).forEach(file => {
+            formData.append('images[]', file);
+        });
+    }
+    
+    // Get submit button and disable it
+    const submitBtn = document.querySelector('#reviewModal button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    
+    // Make the API call
+    fetch(`/product/${productId}/review`, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-Token': csrfToken
+        },
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            alert('Review submitted successfully!');
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('reviewModal'));
+            modal.hide();
+            
+            // Reload page
+            window.location.reload();
+        } else {
+            throw new Error(data.message || 'Error submitting review');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert(error.message || 'Error submitting review. Please try again.');
+    })
+    .finally(() => {
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Submit Review';
+    });
+}
+
+function cancelOrder(orderId) {
+    if (!confirm('Are you sure you want to cancel this order?')) return;
+    
+    fetch(`/orders/${orderId}/cancel`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert(data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error cancelling order');
+    });
+}
+
+// Star rating functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const ratingStars = document.querySelectorAll('.rating-stars i');
+    const ratingInput = document.getElementById('selectedRating');
+    const ratingText = document.querySelector('.rating-text');
+    
+    const ratingMessages = {
+        '1': 'Poor',
+        '2': 'Fair',
+        '3': 'Good',
+        '4': 'Very Good',
+        '5': 'Excellent'
+    };
+    
+    ratingStars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = this.getAttribute('data-rating');
+            ratingInput.value = rating;
+            
+            // Update star colors
+            ratingStars.forEach(s => {
+                if (s.getAttribute('data-rating') <= rating) {
+                    s.classList.add('active');
+                } else {
+                    s.classList.remove('active');
+                }
+            });
+            
+            // Update rating text
+            if (ratingText) {
+                ratingText.textContent = ratingMessages[rating] || '';
+            }
+        });
+        
+        // Hover effects
+        star.addEventListener('mouseover', function() {
+            const rating = this.getAttribute('data-rating');
+            ratingStars.forEach(s => {
+                if (s.getAttribute('data-rating') <= rating) {
+                    s.classList.add('hover');
+                }
+            });
+            
+            // Show rating text on hover
+            if (ratingText) {
+                ratingText.textContent = ratingMessages[rating] || '';
+            }
+        });
+        
+        star.addEventListener('mouseout', function() {
+            ratingStars.forEach(s => {
+                s.classList.remove('hover');
+            });
+            
+            // Restore selected rating text or clear if none selected
+            if (ratingText) {
+                const selectedRating = ratingInput.value;
+                ratingText.textContent = selectedRating ? ratingMessages[selectedRating] : '';
+            }
+        });
+    });
+});
+
+function previewMedia(input) {
+    const preview = document.getElementById('mediaPreview');
+    const uploadPrompt = document.getElementById('uploadPrompt');
+    
+    if (input.files && input.files.length > 0) {
+        const totalFiles = preview.children.length + input.files.length;
+        if (totalFiles > 5) {
+            alert('Maximum 5 files allowed');
+            return;
+        }
+        
+        uploadPrompt.style.display = 'none';
+        
+        Array.from(input.files).forEach(file => {
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const container = document.createElement('div');
+                container.className = 'position-relative';
+                container.innerHTML = `
+                    <img src="${e.target.result}" 
+                         class="rounded shadow-sm" 
+                         style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
+                         onclick="showImagePreview(this.src)">
+                    <button type="button" 
+                            class="btn-close position-absolute top-0 end-0 bg-white rounded-circle shadow-sm" 
+                            style="padding: 4px; margin: 4px;"
+                            onclick="removeMedia(this)">
+                    </button>
+                `;
+                preview.appendChild(container);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+}
+
+function removeMedia(button) {
+    const container = button.closest('.position-relative');
+    const preview = document.getElementById('mediaPreview');
+    const input = document.getElementById('reviewMedia');
+    const index = Array.from(preview.children).indexOf(container);
+    
+    // Remove from preview
+    container.remove();
+    
+    // Remove from input files
+    const dataTransfer = new DataTransfer();
+    Array.from(input.files).forEach((file, i) => {
+        if (i !== index) {
+            dataTransfer.items.add(file);
+        }
+    });
+    input.files = dataTransfer.files;
+    
+    // Show upload prompt if no files left
+    if (preview.children.length === 0) {
+        document.getElementById('uploadPrompt').style.display = 'block';
+    }
+}
+
+// Initialize drag and drop functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.querySelector('.upload-area');
+    const reviewMedia = document.getElementById('reviewMedia');
+
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    // Handle drag enter/over
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, highlight, false);
+    });
+
+    // Handle drag leave/drop
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+        uploadArea.classList.add('border-primary');
+    }
+
+    function unhighlight(e) {
+        uploadArea.classList.remove('border-primary');
+    }
+
+    // Handle dropped files
+    uploadArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const droppedFiles = dt.files;
+        const input = document.getElementById('reviewMedia');
+        const preview = document.getElementById('mediaPreview');
+        
+        // Check total number of files (existing + new)
+        const totalFiles = preview.children.length + droppedFiles.length;
+        if (totalFiles > 5) {
+            alert('Maximum 5 files allowed');
+            return;
+        }
+        
+        // Create new FileList combining existing and new files
+        const dataTransfer = new DataTransfer();
+        
+        // Add existing files
+        if (input.files) {
+            Array.from(input.files).forEach(file => dataTransfer.items.add(file));
+        }
+        
+        // Add new dropped files
+        Array.from(droppedFiles).forEach(file => {
+            if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+                if (file.size <= 5 * 1024 * 1024) {
+                    dataTransfer.items.add(file);
+                } else {
+                    alert(`File "${file.name}" exceeds 5MB limit`);
+                }
+            }
+        });
+        
+        // Update input files
+        input.files = dataTransfer.files;
+        
+        // Preview the new files
+        const tempInput = { files: droppedFiles };
+        previewMedia(tempInput);
+    }
+});
+
+function showImagePreview(src) {
+    const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+    const previewImage = document.getElementById('previewImage');
+    previewImage.src = src;
+    modal.show();
+}
+</script>
+
+<!-- Review Modal -->
+<div class="modal fade" id="reviewModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Share Your Experience</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="reviewForm" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" id="productId" name="product_id">
+                    <input type="hidden" id="orderId" name="order_id">
+                    <input type="hidden" id="selectedRating" name="rating">
+                    <!-- Rating Stars -->
+                    <div class="text-center mb-4">
+                        <div class="rating-stars">
+                            {% for i in range(1, 6) %}
+                            <i class="fas fa-star fa-2x" data-rating="{{ i }}"></i>
+                            {% endfor %}
+                        </div>
+                        <div class="rating-text text-primary fw-medium mt-2"></div>
+                    </div>
+
+                    <!-- Review Text -->
+                    <div class="mb-4">
+                        <label class="form-label fw-medium mb-2">Your Review</label>
+                        <textarea 
+                            class="form-control border-2" 
+                            name="comment" 
+                            id="reviewComment" 
+                            rows="4" 
+                            placeholder="What did you like or dislike about this product?"
+                            required></textarea>
+                    </div>
+
+                    <!-- Media Upload -->
+                    <div class="mb-3">
+                        <label class="form-label d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-medium">Add Photos/Videos</span>
+                            <small class="text-muted">Optional • Max 5 files</small>
+                        </label>
+                        <div class="upload-area p-4 rounded-3 bg-light border border-2 border-dashed position-relative">
+                            <input type="file" class="d-none" id="reviewMedia" name="images[]" 
+                                   multiple accept="image/*" onchange="previewMedia(this)">
+                            <div class="text-center" id="uploadPrompt">
+                                <i class="fas fa-cloud-upload-alt fa-2x text-primary mb-2"></i>
+                                <p class="mb-1">Drag & drop files here</p>
+                                <small class="text-muted d-block mb-2">or</small>
+                                <button type="button" class="btn btn-outline-primary btn-sm px-4"
+                                        onclick="document.getElementById('reviewMedia').click()">
+                                    Browse Files
+                                </button>
+                            </div>
+                            <div id="mediaPreview" class="d-flex flex-wrap gap-2 mt-3"></div>
+                        </div>
+                        <small class="text-muted mt-2 d-block">
+                            Supported formats: JPG, PNG, MP4 • Max size: 5MB per file
+                        </small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light fw-medium" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary px-4 fw-medium" onclick="submitReview(event)">
+                    Submit Review
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal-content {
+    border-radius: 16px;
+}
+
+.rating-stars {
+    display: inline-flex;
+    gap: 12px;
+    padding: 15px 0;
+    position: relative;
+}
+
+.rating-stars i {
+    font-size: 32px;
+    cursor: pointer;
+    color: #e4e5e7;
+    transition: all 0.2s ease;
+}
+
+.rating-stars i.hover,
+.rating-stars i.active {
+    color: #ffc107;
+    transform: scale(1.2);
+}
+
+.rating-text {
+    min-height: 24px;
+    font-size: 1rem;
+}
+
+.border-dashed {
+    border-style: dashed !important;
+}
+
+.upload-area {
+    min-height: 200px;
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+    border-color: var(--bs-primary) !important;
+    background-color: var(--bs-light) !important;
+}
+
+#mediaPreview img,
+#mediaPreview video {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+#imagePreviewModal .modal-content {
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+#imagePreviewModal .btn-close {
+    filter: invert(1);
+}
+
+#imagePreviewModal #previewImage {
+    max-height: 80vh;
+    width: auto;
+    margin: 0 auto;
+}
+
+.review-thumbnails img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.review-thumbnails img.active {
+    opacity: 1;
+    border: 2px solid #c003ffaa;
+}
+</style>
+{% endblock %} 

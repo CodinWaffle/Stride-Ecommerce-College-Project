@@ -1,0 +1,731 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header Section -->
+    <div class="dashboard-hero mb-4 rounded-4 position-relative overflow-hidden">
+        <div class="hero-bg-pattern"></div>
+        <div class="container position-relative">
+            <div class="d-flex justify-content-between align-items-center py-4 px-3">
+                <div>
+                    <h2 class="fw-bold mb-1 text-white">Welcome Back!</h2>
+                    <p class="mb-0 text-white-50">Here's what's happening with your store today.</p>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
+                    <a href="{{ url_for('product.manage_products') }}" 
+                       class="hero-btn btn-glass"
+                       role="button"
+                       aria-label="Manage Products">
+                        <span class="btn-content">
+                            <i class="fas fa-box" aria-hidden="true"></i>
+                            <span>Products</span>
+                        </span>
+                    </a>
+                    <a href="{{ url_for('product.seller_orders') }}" 
+                       class="hero-btn btn-glass"
+                       role="button"
+                       aria-label="View Orders">
+                        <span class="btn-content">
+                            <i class="fas fa-shopping-bag" aria-hidden="true"></i>
+                            <span>Orders</span>
+                        </span>
+                    </a>
+                    <a href="{{ url_for('product.manage_categories') }}" 
+                       class="hero-btn btn-glass"
+                       role="button"
+                       aria-label="Manage Categories">
+                        <span class="btn-content">
+                            <i class="fas fa-tags" aria-hidden="true"></i>
+                            <span>Categories</span>
+                        </span>
+                    </a>
+                    <a href="{{ url_for('product.seller_store', username=current_user.username) }}" 
+                       class="hero-btn btn-glass"
+                       role="button"
+                       aria-label="View Store">
+                        <span class="btn-content">
+                            <i class="fas fa-store" aria-hidden="true"></i>
+                            <span>Store</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        {% for stat in [
+            {'title': 'Total Products', 'value': total_products|default(0), 'icon': 'box', 'color': 'success'},
+            {'title': 'Low Stock Items', 'value': low_stock_products|default(0), 'icon': 'exclamation-triangle', 'color': 'warning'},
+            {'title': 'Total Stock', 'value': total_stock|default(0), 'icon': 'boxes', 'color': 'info'},
+            {'title': 'Average Order', 'value': average_order|default(0), 'icon': 'shopping-cart', 'color': 'purple', 'is_currency': true}
+        ] %}
+        <div class="col-md-3">
+            <div class="dashboard-card stats-card bg-gradient-{{ stat.color }} hover-lift" id="stat-{{ loop.index }}">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-white-50 mb-2">{{ stat.title }}</p>
+                            <h3 class="text-white mb-0">
+                                <span class="stat-value">
+                                    {% if stat.is_currency %}₱{{ "{:,.2f}".format(stat.value) }}{% else %}{{ stat.value }}{% endif %}
+                                </span>
+                                <div class="stat-loading d-none">
+                                    <div class="spinner-border spinner-border-sm text-white" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </h3>
+                        </div>
+                        <div class="icon-circle">
+                            <i class="fas fa-{{ stat.icon }} fa-lg"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-error d-none alert alert-danger m-2">
+                    Error loading data
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row g-3">
+        <!-- Sales Analytics -->
+        <div class="col-lg-8">
+            <div class="dashboard-card analytics-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h5 class="fw-bold mb-1">Sales Analytics</h5>
+                        <p class="text-muted mb-0">Overview of your store's performance</p>
+                    </div>
+                    <div class="chart-controls">
+                        <div class="period-selector">
+                            <button class="analytics-btn active" data-period="weekly">
+                                <div class="btn-content">
+                                    <i class="fas fa-calendar-week"></i>
+                                    <span>7D</span>
+                                </div>
+                            </button>
+                            <button class="analytics-btn" data-period="monthly">
+                                <div class="btn-content">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>30D</span>
+                                </div>
+                            </button>
+                            <button class="analytics-btn" data-period="yearly">
+                                <div class="btn-content">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>1Y</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-wrapper position-relative" style="height: 400px;">
+                    <div class="chart-loading position-absolute w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-75" style="z-index: 1;">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary mb-2" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div class="text-muted">Loading sales data...</div>
+                        </div>
+                    </div>
+                    <canvas id="salesChart"></canvas>
+                    <div class="chart-error alert alert-danger d-none m-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <div class="flex-grow-1">Error loading sales data</div>
+                            <button type="button" class="btn btn-sm btn-outline-danger ms-3 retry-btn">
+                                <i class="fas fa-redo-alt me-1"></i>Retry
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="col-lg-4">
+            <div class="dashboard-card h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="fw-bold mb-1">Recent Orders</h5>
+                            <p class="text-muted mb-0">Latest transactions</p>
+                        </div>
+                        <a href="{{ url_for('product.seller_orders') }}" class="btn btn-outline-primary btn-sm hover-lift">
+                            View All
+                        </a>
+                    </div>
+                    <div class="recent-orders-list">
+                        {% for order in recent_orders %}
+                        <div class="order-item p-3 rounded-3 mb-3 bg-light">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">#{{ order.id }}</span>
+                                <span class="badge bg-{{ order_status_colors[order.status] }}">
+                                    {{ order.status|title }}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">₱{{ "%.2f"|format(order.total) }}</span>
+                                <small class="text-muted">{{ order.created_at.strftime('%Y-%m-%d') }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.dashboard-hero {
+    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.hero-bg-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.1;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.hero-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.hero-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.hero-btn:hover::before {
+    opacity: 1;
+}
+
+.hero-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.hero-btn:active {
+    transform: translateY(1px);
+}
+
+.hero-btn .btn-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-btn .btn-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+.hero-btn.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.hero-btn.loading .btn-content {
+    visibility: hidden;
+}
+
+.hero-btn.loading .btn-loading {
+    display: block !important;
+}
+
+.btn-glass {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-glass:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-glass:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-glass-outline {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.btn-glass-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+
+.dropdown-menu {
+    margin-top: 0.75rem;
+    min-width: 240px;
+    border-radius: 1rem;
+    border: none;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    animation: dropdownFade 0.2s ease;
+}
+
+.dropdown-item {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    margin: 0.25rem 0.5rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.dropdown-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366F1;
+    transition: all 0.2s ease;
+}
+
+.dropdown-text {
+    flex: 1;
+}
+
+.dropdown-text small {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.dropdown-item:hover {
+    background: rgba(99, 102, 241, 0.08);
+    color: #6366F1;
+}
+
+.dropdown-item:hover .dropdown-icon {
+    background: #6366F1;
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.dropdown-divider {
+    margin: 0.5rem 0;
+    opacity: 0.1;
+}
+
+.dropdown-arrow {
+    font-size: 0.75rem;
+    transition: transform 0.2s ease;
+}
+
+.show .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.dashboard-card {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    background: #fff;
+}
+
+.stats-card {
+    color: #fff;
+    overflow: hidden;
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+}
+
+.bg-gradient-purple {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+}
+
+.icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.analytics-card {
+    background: #fff;
+    min-height: 500px;
+}
+
+.chart-wrapper {
+    position: relative;
+    margin-top: 1rem;
+    background: rgba(99, 102, 241, 0.02);
+    border-radius: 1rem;
+    padding: 1.5rem;
+}
+
+.period-selector {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.analytics-btn {
+    border: none;
+    background: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    color: #6B7280;
+    position: relative;
+    cursor: pointer;
+}
+
+.analytics-btn.active {
+    color: #fff;
+    background: #8A2BE2;
+}
+
+.analytics-btn .btn-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.order-item {
+    transition: transform 0.2s ease;
+}
+
+.order-item:hover {
+    transform: translateX(4px);
+}
+
+.hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+</style>
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/smooth-transitions.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add error handling for statistics cards
+    function showStatError(statId, message) {
+        const card = document.getElementById(`stat-${statId}`);
+        const errorDiv = card.querySelector('.stat-error');
+        const loadingDiv = card.querySelector('.stat-loading');
+        const valueDiv = card.querySelector('.stat-value');
+        
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('d-none');
+        loadingDiv.classList.add('d-none');
+        valueDiv.classList.add('d-none');
+        
+        // Hide error after 5 seconds and show default value
+        setTimeout(() => {
+            errorDiv.classList.add('d-none');
+            valueDiv.classList.remove('d-none');
+        }, 5000);
+    }
+
+    function showStatLoading(statId) {
+        const card = document.getElementById(`stat-${statId}`);
+        const loadingDiv = card.querySelector('.stat-loading');
+        const valueDiv = card.querySelector('.stat-value');
+        const errorDiv = card.querySelector('.stat-error');
+        
+        loadingDiv.classList.remove('d-none');
+        valueDiv.classList.add('d-none');
+        errorDiv.classList.add('d-none');
+    }
+
+    function hideStatLoading(statId) {
+        const card = document.getElementById(`stat-${statId}`);
+        const loadingDiv = card.querySelector('.stat-loading');
+        const valueDiv = card.querySelector('.stat-value');
+        
+        loadingDiv.classList.add('d-none');
+        valueDiv.classList.remove('d-none');
+    }
+
+    // Initialize chart configuration
+    const config = {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Sales',
+                data: [],
+                borderColor: '#9370DB',
+                backgroundColor: 'rgba(147, 112, 219, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    titleColor: '#000',
+                    bodyColor: '#666',
+                    borderColor: 'rgba(147, 112, 219, 0.1)',
+                    borderWidth: 1,
+                    displayColors: false,
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            return '₱' + context.parsed.y.toLocaleString();
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '₱' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    // Initialize chart
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    let salesChart = new Chart(ctx, config);
+    let currentPeriod = 'weekly';
+    let retryCount = 0;
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY = 2000; // 2 seconds
+
+    // Show/hide loading state
+    function toggleChartLoading(show) {
+        const loadingEl = document.querySelector('.chart-loading');
+        if (show) {
+            loadingEl.classList.remove('d-none');
+        } else {
+            loadingEl.classList.add('d-none');
+        }
+    }
+
+    // Show/hide error state
+    function toggleChartError(show, message = 'Error loading sales data') {
+        const errorEl = document.querySelector('.chart-error');
+        if (show) {
+            errorEl.querySelector('.flex-grow-1').textContent = message;
+            errorEl.classList.remove('d-none');
+        } else {
+            errorEl.classList.add('d-none');
+        }
+    }
+
+    // Fetch chart data with improved error handling and retries
+    async function fetchChartData(period, isRetry = false) {
+        if (!isRetry) {
+            retryCount = 0;
+        }
+
+        try {
+            toggleChartLoading(true);
+            toggleChartError(false);
+
+            const url = new URL('{{ url_for("product.get_analytics") }}', window.location.origin);
+            url.searchParams.set('period', period);
+
+            const response = await Promise.race([
+                fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                }),
+                new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Request timeout')), 10000)
+                )
+            ]);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            if (!data.labels || !data.values) {
+                throw new Error('Invalid data format received');
+            }
+
+            if (data.labels.length === 0 || data.values.every(v => v === 0)) {
+                salesChart.data.labels = ['No sales data'];
+                salesChart.data.datasets[0].data = [0];
+            } else {
+                salesChart.data.labels = data.labels;
+                salesChart.data.datasets[0].data = data.values;
+            }
+            
+            salesChart.update();
+            toggleChartLoading(false);
+            retryCount = 0;
+
+        } catch (error) {
+            console.error('Error fetching chart data:', error);
+            
+            if (retryCount < MAX_RETRIES) {
+                retryCount++;
+                toggleChartError(true, `Loading failed. Retrying (${retryCount}/${MAX_RETRIES})...`);
+                
+                setTimeout(() => {
+                    fetchChartData(period, true);
+                }, RETRY_DELAY * retryCount);
+            } else {
+                toggleChartLoading(false);
+                toggleChartError(true, `Failed to load sales data: ${error.message}`);
+            }
+        }
+    }
+
+    // Add click handlers for period buttons
+    const periodButtons = document.querySelectorAll('.analytics-btn');
+    periodButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const period = this.dataset.period;
+            if (period === currentPeriod) return;
+            
+            // Update active state
+            periodButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            currentPeriod = period;
+            fetchChartData(period);
+        });
+    });
+
+    // Add retry button handler
+    document.querySelector('.retry-btn').addEventListener('click', function() {
+        retryCount = 0;
+        fetchChartData(currentPeriod);
+    });
+
+    // Initial load
+    fetchChartData('weekly');
+
+    // Add click handlers for hero buttons
+    const heroButtons = document.querySelectorAll('.hero-btn');
+    heroButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const action = this.dataset.action;
+            if (!action) return;
+
+            // Show loading state
+            this.classList.add('loading');
+            
+            // Store the original href
+            const href = this.getAttribute('href');
+            
+            // Prevent immediate navigation
+            e.preventDefault();
+            
+            // Simulate a delay for better UX (remove in production)
+            setTimeout(() => {
+                window.location.href = href;
+            }, 300);
+        });
+    });
+
+    // Add keyboard navigation
+    heroButtons.forEach(button => {
+        button.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
+    });
+
+    function showToast(type, message) {
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        toast.addEventListener('hidden.bs.toast', () => toast.remove());
+    }
+});
+</script>
+{% endblock %}
+
+{% endblock %}

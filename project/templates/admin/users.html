@@ -1,0 +1,281 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Users - Admin{% endblock %}
+
+{% block header %}User Management{% endblock %}
+
+{% block content %}
+<div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg transition-colors duration-200">
+    <!-- Search and Filter Section -->
+    <div class="px-4 py-5 border-b border-gray-200 dark:border-gray-700 sm:px-6">
+        <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 md:space-x-4">
+            <!-- Search Bar -->
+            <div class="w-full md:w-96">
+                <label for="search" class="sr-only">Search users</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input type="text" 
+                           id="searchInput" 
+                           class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                           placeholder="Search by name, email, or phone..."
+                           onkeyup="filterUsers()">
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex space-x-4">
+                <select id="roleFilter" 
+                        onchange="filterUsers()"
+                        class="block pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    <option value="all">All Roles</option>
+                    <option value="admin">Admins</option>
+                    <option value="seller">Sellers</option>
+                    <option value="customer">Customers</option>
+                </select>
+
+                <select id="statusFilter" 
+                        onchange="filterUsers()"
+                        class="block pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+
+                <button onclick="resetFilters()" 
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Reset
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="flex flex-col">
+        <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                <div class="overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    User
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Role
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Status
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Joined
+                                </th>
+                                <th scope="col" class="relative px-6 py-3">
+                                    <span class="sr-only">Actions</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            {% for user in users %}
+                            <tr class="user-row hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                                data-username="{{ user.username }}"
+                                data-email="{{ user.email }}"
+                                data-phone="{{ user.phone }}"
+                                data-role="{% if user.is_admin %}admin{% elif user.is_seller %}seller{% else %}customer{% endif %}"
+                                data-status="{% if user.is_active %}active{% else %}inactive{% endif %}">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            {% if user.profile_image %}
+                                            <img class="h-10 w-10 rounded-full object-cover" src="{{ url_for('static', filename=user.profile_image) }}" alt="">
+                                            {% else %}
+                                            <div class="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center">
+                                                <span class="text-white font-medium text-sm">{{ user.username[0].upper() }}</span>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                                {{ user.username }}
+                                            </div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                {{ user.email }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900 dark:text-white">
+                                        {% if user.is_admin %}
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                            Admin
+                                        </span>
+                                        {% elif user.is_seller %}
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                            Seller
+                                        </span>
+                                        {% else %}
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+                                            Customer
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if user.is_active %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200{% else %}bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200{% endif %}">
+                                        {{ "Active" if user.is_active else "Inactive" }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                    {{ user.created_at.strftime('%Y-%m-%d') }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    {% if not user.is_admin or current_user.id != user.id %}
+                                    <div class="flex space-x-3">
+                                        <button data-user-id="{{ user.id }}" 
+                                                data-is-active="{{ user.is_active|string|lower }}"
+                                                class="toggle-status-btn text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                            {{ "Deactivate" if user.is_active else "Activate" }}
+                                        </button>
+                                        <button data-user-id="{{ user.id }}"
+                                                class="delete-user-btn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                                            Delete
+                                        </button>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    {% if not users %}
+    <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No users</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            No users have been registered yet.
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- JavaScript for filtering -->
+<script>
+function filterUsers() {
+    const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+    const roleFilter = document.getElementById('roleFilter').value;
+    const statusFilter = document.getElementById('statusFilter').value;
+    const rows = document.getElementsByClassName('user-row');
+
+    Array.from(rows).forEach(row => {
+        const username = row.dataset.username.toLowerCase();
+        const email = row.dataset.email.toLowerCase();
+        const phone = (row.dataset.phone || '').toLowerCase();
+        const role = row.dataset.role;
+        const status = row.dataset.status;
+
+        const matchesSearch = username.includes(searchQuery) || 
+                            email.includes(searchQuery) || 
+                            phone.includes(searchQuery);
+        const matchesRole = roleFilter === 'all' || role === roleFilter;
+        const matchesStatus = statusFilter === 'all' || status === statusFilter;
+
+        if (matchesSearch && matchesRole && matchesStatus) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('roleFilter').value = 'all';
+    document.getElementById('statusFilter').value = 'all';
+    filterUsers();
+}
+
+// Add event listeners for toggle and delete buttons
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButtons = document.querySelectorAll('.toggle-status-btn');
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = this.dataset.userId;
+            const isActive = this.dataset.isActive === 'true';
+            toggleUserStatus(userId, isActive);
+        });
+    });
+
+    const deleteButtons = document.querySelectorAll('.delete-user-btn');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = this.dataset.userId;
+            deleteUser(userId);
+        });
+    });
+});
+
+async function deleteUser(userId) {
+    if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+        try {
+            const response = await fetch(`/admin/users/delete/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'Failed to delete user');
+            }
+        } catch (error) {
+            alert('An error occurred while deleting the user');
+        }
+    }
+}
+
+async function toggleUserStatus(userId, currentStatus) {
+    if (confirm(`Are you sure you want to ${currentStatus ? 'deactivate' : 'activate'} this user?`)) {
+        try {
+            const response = await fetch(`/admin/users/toggle_status/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'Failed to update user status');
+            }
+        } catch (error) {
+            alert('An error occurred while updating user status');
+        }
+    }
+}
+</script>
+{% endblock %} 

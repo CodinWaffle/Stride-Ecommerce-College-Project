@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="md:grid md:grid-cols-3 md:gap-6">
+            <div class="md:col-span-1">
+                <div class="px-4 sm:px-0">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900">Create New User</h3>
+                    <p class="mt-1 text-sm text-gray-600">
+                        Add a new user to the system. All fields are required.
+                    </p>
+                </div>
+            </div>
+            <div class="mt-5 md:mt-0 md:col-span-2">
+                <form action="{{ url_for('admin.create_user') }}" method="POST">
+                    <div class="shadow sm:rounded-md sm:overflow-hidden">
+                        <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                            <!-- Flash Messages -->
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    {% for category, message in messages %}
+                                        <div class="rounded-md {% if category == 'error' %}bg-red-50 text-red-700{% else %}bg-green-50 text-green-700{% endif %} p-4">
+                                            {{ message }}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
+
+                            <!-- Username -->
+                            <div>
+                                <label for="username" class="block text-sm font-medium text-gray-700">
+                                    Username
+                                </label>
+                                <div class="mt-1">
+                                    <input type="text" name="username" id="username" required
+                                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700">
+                                    Email
+                                </label>
+                                <div class="mt-1">
+                                    <input type="email" name="email" id="email" required
+                                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                            </div>
+
+                            <!-- Password -->
+                            <div>
+                                <label for="password" class="block text-sm font-medium text-gray-700">
+                                    Password
+                                </label>
+                                <div class="mt-1">
+                                    <input type="password" name="password" id="password" required
+                                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                            </div>
+
+                            <!-- Admin Toggle -->
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input type="checkbox" name="is_admin" id="is_admin"
+                                        class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="is_admin" class="font-medium text-gray-700">Admin privileges</label>
+                                    <p class="text-gray-500">Grant admin access to this user</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                            <a href="{{ url_for('admin.manage_users') }}"
+                                class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-3">
+                                Cancel
+                            </a>
+                            <button type="submit"
+                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Create User
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

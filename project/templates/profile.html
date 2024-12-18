@@ -1,0 +1,595 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Profile Header -->
+    <div class="profile-header mb-4 rounded-4">
+        <div class="profile-content p-4">
+            <div class="row align-items-center">
+                <!-- Profile Image -->
+                <div class="col-auto d-flex align-items-center">
+                    <div class="profile-image-wrapper">
+                        <img src="{{ url_for('static', filename=user.profile_image) if user.profile_image and not user.profile_image.startswith('http') else user.profile_image if user.profile_image and user.profile_image.startswith('http') else url_for('static', filename='img/placeholder-profile.jpg') }}" 
+                             class="profile-image"
+                             id="profilePreview"
+                             alt="{{ user.username }}"
+                             onerror="this.src=`{{ url_for('static', filename='img/placeholder-profile.jpg') }}`">
+                    </div>
+                    <label for="profileImage" class="profile-image-edit ms-3" title="Change Profile Picture">
+                        <i class="fas fa-camera"></i>
+                        <span>Change Photo</span>
+                    </label>
+                </div>
+                
+                <!-- Profile Info -->
+                <div class="col">
+                    <div class="profile-info">
+                        <!-- Name and Badge -->
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                            <h2 class="text-white mb-0">{{ user.username }}</h2>
+                            {% if user.is_seller %}
+                                <span class="seller-badge">
+                                    <i class="fas fa-store me-1"></i>
+                                    Seller
+                                </span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Contact Info -->
+                        <div class="profile-details d-flex flex-wrap gap-3 mb-3">
+                            {% if current_user and current_user.id == user.id %}
+                                <!-- Show private info only to profile owner -->
+                                <div class="profile-detail">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>{{ user.email }}</span>
+                                </div>
+                                {% if user.phone %}
+                                    <div class="profile-detail">
+                                        <i class="fas fa-phone"></i>
+                                        <span>{{ user.phone }}</span>
+                                    </div>
+                                {% endif %}
+                            {% elif current_user %}
+                                <!-- Show contact button to logged-in users -->
+                                <button class="btn btn-light btn-sm contact-btn" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#contactModal">
+                                    <i class="fas fa-envelope me-2"></i>Contact
+                                </button>
+                            {% endif %}
+                            {% if user.is_seller and user.store_name %}
+                                <div class="profile-detail">
+                                    <i class="fas fa-store"></i>
+                                    <span>{{ user.store_name }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Stats -->
+                        {% if user.is_seller %}
+                            <div class="profile-stats d-flex flex-wrap gap-4">
+                                <div class="stat-item">
+                                    <span class="stat-value">{{ user.products|length }}</span>
+                                    <span class="stat-label">Products</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">{{ user.orders|length }}</span>
+                                    <span class="stat-label">Orders</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">{{ user.reviews|length if user.reviews else 0 }}</span>
+                                    <span class="stat-label">Reviews</span>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            <div class="profile-sidebar rounded-4">
+                <div class="nav-section">
+                    <h6 class="nav-section-title">
+                        <span class="nav-section-icon"><i class="fas fa-user"></i></span>
+                        ACCOUNT
+                    </h6>
+                    <div class="nav flex-column nav-pills">
+                        <a href="{{ url_for('main.profile') }}" class="nav-link">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Profile Settings</span>
+                        </a>
+                        <a href="{{ url_for('main.orders') }}" class="nav-link">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>My Orders</span>
+                        </a>
+                    </div>
+                </div>
+
+                {% if user.is_seller %}
+                <div class="nav-section">
+                    <h6 class="nav-section-title">
+                        <span class="nav-section-icon"><i class="fas fa-store"></i></span>
+                        SELLER
+                    </h6>
+                    <div class="nav flex-column nav-pills">
+                        <a href="{{ url_for('product.seller_dashboard') }}" class="nav-link">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Seller Dashboard</span>
+                        </a>
+                        <a href="{{ url_for('product.manage_products') }}" class="nav-link">
+                            <i class="fas fa-box"></i>
+                            <span>Products</span>
+                        </a>
+                        <a href="{{ url_for('product.seller_orders') }}" class="nav-link">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Orders</span>
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <div class="profile-content-wrapper rounded-4">
+                <form method="POST" enctype="multipart/form-data" action="{{ url_for('main.profile') }}" class="needs-validation" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="file" id="profileImage" name="profile_image" accept="image/*" class="d-none" onchange="previewImage(this)">
+                    
+                    <!-- Personal Information -->
+                    <div class="profile-section">
+                        <div class="section-header">
+                            <h5 class="section-title">
+                                <i class="fas fa-user-circle text-primary"></i>
+                                Personal Information
+                            </h5>
+                            <p class="section-subtitle">Update your personal details and contact information</p>
+                        </div>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="username" name="username" 
+                                           value="{{ user.username }}" required>
+                                    <label for="username">Username</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           value="{{ user.email }}" required>
+                                    <label for="email">Email</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="tel" class="form-control" id="phone" name="phone" 
+                                           value="{{ user.phone }}">
+                                    <label for="phone">Phone Number</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea class="form-control" id="address" name="address" 
+                                              style="height: 100px">{{ user.address }}</textarea>
+                                    <label for="address">Address</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if user.is_seller %}
+                    <!-- Store Information -->
+                    <div class="profile-section">
+                        <div class="section-header">
+                            <h5 class="section-title">
+                                <i class="fas fa-store text-primary"></i>
+                                Store Information
+                            </h5>
+                            <p class="section-subtitle">Manage your store details and description</p>
+                        </div>
+
+                        <div class="row g-4">
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="store_name" name="store_name" 
+                                           value="{{ user.store_name }}">
+                                    <label for="store_name">Store Name</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea class="form-control" id="store_description" name="store_description" 
+                                              style="height: 120px">{{ user.store_description }}</textarea>
+                                    <label for="store_description">Store Description</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="profile-section border-0 pb-0 mb-0">
+                        <button type="submit" class="btn btn-primary btn-lg px-5">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contact Modal -->
+<div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contactModalLabel">Contact {{ user.username }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="contactForm" action="{{ url_for('main.contact_user', user_id=user.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Profile Header */
+.profile-header {
+    background: linear-gradient(135deg, #9370DB 0%, #8A2BE2 100%);
+    box-shadow: 0 4px 16px rgba(147, 112, 219, 0.2);
+}
+
+.profile-content {
+    position: relative;
+}
+
+.profile-header .profile-image-wrapper {
+    position: relative;
+    display: inline-block;
+    margin: 1.5rem 0;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.profile-header .profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.profile-header .profile-image-edit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+    padding: 0 16px;
+    color: white;
+    white-space: nowrap;
+}
+
+.profile-header .profile-image-edit span {
+    color: white;
+    font-size: 14px;
+    margin-left: 8px;
+    font-weight: 500;
+}
+
+.profile-header .profile-image-edit:hover {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.profile-header .profile-image-edit i {
+    color: #fff;
+    font-size: 14px;
+}
+
+.profile-info h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.seller-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    color: white;
+    font-size: 0.875rem;
+}
+
+.profile-detail {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.profile-detail i {
+    opacity: 0.8;
+}
+
+.profile-stats {
+    padding-top: 0.5rem;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    min-width: 100px;
+}
+
+.stat-value {
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.stat-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+    .profile-header .profile-image-wrapper {
+        width: 70px;
+        height: 70px;
+        margin: 1rem 0;
+    }
+    
+    .profile-header .profile-image-edit {
+        height: 32px;
+        padding: 0 12px;
+    }
+    
+    .profile-header .profile-image-edit span {
+        font-size: 12px;
+    }
+    
+    .profile-header .profile-image-edit i {
+        font-size: 12px;
+    }
+}
+
+/* Sidebar */
+.profile-sidebar {
+    background: #fff;
+    box-shadow: 0 4px 20px rgba(147, 112, 219, 0.08);
+    padding: 1.5rem;
+    position: sticky;
+    top: 1rem;
+    border: 1px solid rgba(147, 112, 219, 0.1);
+}
+
+.nav-section {
+    margin-bottom: 2rem;
+}
+
+.nav-section:last-child {
+    margin-bottom: 0;
+}
+
+.nav-section-title {
+    color: #666;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid rgba(147, 112, 219, 0.1);
+}
+
+.nav-section-icon {
+    color: #9370DB;
+    font-size: 0.9rem;
+}
+
+.nav-link {
+    color: #555;
+    padding: 0.875rem 1rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    transition: all 0.2s ease;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    background: transparent;
+}
+
+.nav-link:last-child {
+    margin-bottom: 0;
+}
+
+.nav-link i {
+    font-size: 1.1rem;
+    color: #888;
+    width: 1.5rem;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+    background: rgba(147, 112, 219, 0.08);
+    color: #9370DB;
+    transform: translateX(4px);
+}
+
+.nav-link:hover i {
+    color: #9370DB;
+}
+
+@media (max-width: 991.98px) {
+    .profile-sidebar {
+        position: relative;
+        top: 0;
+        margin-bottom: 2rem;
+    }
+}
+
+/* Main Content */
+.profile-content-wrapper {
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(147, 112, 219, 0.1);
+    padding: 2rem;
+}
+
+.profile-section {
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(147, 112, 219, 0.2);
+}
+
+.section-header {
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    color: #333;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-title i {
+    color: #9370DB;
+}
+
+.section-subtitle {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Form Controls */
+.form-control {
+    border-color: #E5E7EB;
+    padding: 0.75rem 1rem;
+}
+
+.form-control:focus {
+    border-color: rgba(147, 112, 219, 0.4);
+    box-shadow: 0 0 0 0.25rem rgba(147, 112, 219, 0.15);
+}
+
+.form-floating > label {
+    padding: 0.75rem 1rem;
+}
+
+.btn-primary {
+    background-color: #9370DB;
+    border-color: #9370DB;
+    padding: 0.75rem 2rem;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #7B68EE;
+    border-color: #7B68EE;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(147, 112, 219, 0.2);
+}
+
+.btn-primary:active {
+    background-color: #6A5ACD;
+    border-color: #6A5ACD;
+    transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .profile-content-wrapper {
+        padding: 1.5rem;
+    }
+    
+    .profile-image {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .btn-primary {
+        width: 100%;
+    }
+}
+</style>
+
+{% block extra_js %}
+<script>
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('profilePreview').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Form validation
+(function () {
+    'use strict'
+    const forms = document.querySelectorAll('.needs-validation')
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %}
+
+{% endblock %}
+

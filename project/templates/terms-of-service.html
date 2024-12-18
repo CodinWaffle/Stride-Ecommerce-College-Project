@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <h1 class="display-5 fw-bold mb-4">Terms of Service</h1>
+            <p class="text-muted mb-4">Last updated: {{ current_date }}</p>
+
+            <div class="card shadow-sm border-0 p-4 mb-4">
+                <h2 class="h4 mb-3">1. Agreement to Terms</h2>
+                <p>By accessing and using this website, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using this site.</p>
+
+                <h2 class="h4 mb-3">2. Use License</h2>
+                <p>Permission is granted to temporarily access the materials on Stride's website for personal, non-commercial use only. This is the grant of a license, not a transfer of title, and under this license you may not:</p>
+                <ul class="mb-4">
+                    <li>Modify or copy the materials</li>
+                    <li>Use the materials for any commercial purpose</li>
+                    <li>Attempt to reverse engineer any software contained on the website</li>
+                    <li>Remove any copyright or proprietary notations from the materials</li>
+                </ul>
+
+                <h2 class="h4 mb-3">3. Product Information</h2>
+                <p>We strive to display our products and their colors as accurately as possible. However, we cannot guarantee that your computer or mobile device's display of any color will be accurate. We reserve the right to:</p>
+                <ul class="mb-4">
+                    <li>Modify product prices</li>
+                    <li>Discontinue products</li>
+                    <li>Limit order quantities</li>
+                    <li>Refuse service to anyone</li>
+                </ul>
+
+                <h2 class="h4 mb-3">4. Ordering and Payment</h2>
+                <p>By placing an order, you warrant that:</p>
+                <ul class="mb-4">
+                    <li>You are legally capable of entering into binding contracts</li>
+                    <li>All information you provide is true and accurate</li>
+                    <li>You are an authorized user of the payment method provided</li>
+                    <li>You agree to pay all charges incurred under your account</li>
+                </ul>
+
+                <h2 class="h4 mb-3">5. Shipping and Delivery</h2>
+                <p>We aim to deliver products within the estimated delivery times. However:</p>
+                <ul class="mb-4">
+                    <li>Delivery times are not guaranteed</li>
+                    <li>Risk of loss transfers upon delivery to the carrier</li>
+                    <li>You are responsible for providing accurate shipping information</li>
+                    <li>Additional charges may apply for expedited shipping</li>
+                </ul>
+
+                <h2 class="h4 mb-3">6. Returns and Refunds</h2>
+                <p>Our return policy allows you to return items within 30 days of delivery, provided:</p>
+                <ul class="mb-4">
+                    <li>Items are unused and in original condition</li>
+                    <li>Original packaging is intact</li>
+                    <li>Proof of purchase is provided</li>
+                    <li>Return shipping costs are paid by the customer</li>
+                </ul>
+
+                <h2 class="h4 mb-3">7. Disclaimer</h2>
+                <p>The materials on our website are provided on an 'as is' basis. We make no warranties, expressed or implied, and hereby disclaim and negate all other warranties including, without limitation:</p>
+                <ul class="mb-4">
+                    <li>Merchantability</li>
+                    <li>Fitness for a particular purpose</li>
+                    <li>Non-infringement of intellectual property</li>
+                </ul>
+
+                <h2 class="h4 mb-3">8. Limitations</h2>
+                <p>In no event shall Stride or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on our website.</p>
+
+                <h2 class="h4 mb-3">9. Governing Law</h2>
+                <p>These terms and conditions are governed by and construed in accordance with the laws of [Your Country/State], and you irrevocably submit to the exclusive jurisdiction of the courts in that location.</p>
+
+                <h2 class="h4 mb-3">10. Contact Information</h2>
+                <p>For any questions regarding these Terms of Service, please contact us at:</p>
+                <ul class="mb-4">
+                    <li>Email: support@stride.com</li>
+                    <li>Phone: +1 (123) 456-7890</li>
+                    <li>Address: 123 Shoe Street, Fashion District, City, Country</li>
+                </ul>
+            </div>
+
+            <div class="text-muted small">
+                <p>These terms of service are subject to change. We will notify you of any material changes by posting the new terms on this page.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.card {
+    border-radius: 1rem;
+}
+
+.card ul {
+    padding-left: 1.5rem;
+}
+
+.card ul li {
+    margin-bottom: 0.5rem;
+}
+
+h2 {
+    color: var(--bs-primary);
+}
+</style>
+{% endblock %} 

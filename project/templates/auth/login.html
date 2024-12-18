@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="container-fluid min-vh-100 d-flex align-items-center py-5" style="background-color: #f8f9fa;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card border-0 shadow-lg rounded-4 overflow-hidden slide-in-right">
+                        <div class="row g-0">
+                            <!-- Left side - Image/Welcome -->
+                            <div class="col-lg-6 d-none d-lg-block auth-left slide-in-left" style="background: #9370DB;">
+                                <div class="d-flex flex-column justify-content-center h-100 p-5 text-white">
+                                    <h2 class="fw-bold mb-3 fade-in">Welcome Back!</h2>
+                                    <p class="lead mb-4 fade-in delay-1">Sign in to continue your shopping journey with Stride.</p>
+                                    <div class="features fade-in delay-2">
+                                        <div class="feature-item slide-in-left delay-3">
+                                            <div class="d-flex align-items-center">
+                                                <i class="ri-shield-check-line fs-4 me-2"></i>
+                                                <span>Secure Login</span>
+                                            </div>
+                                        </div>
+                                        <div class="feature-item slide-in-left delay-4">
+                                            <div class="d-flex align-items-center">
+                                                <i class="ri-customer-service-2-line fs-4 me-2"></i>
+                                                <span>24/7 Support</span>
+                                            </div>
+                                        </div>
+                                        <div class="feature-item slide-in-left delay-5">
+                                            <div class="d-flex align-items-center">
+                                                <i class="ri-global-line fs-4 me-2"></i>
+                                                <span>Global Marketplace</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right side - Form -->
+                            <div class="col-lg-6 auth-right slide-in-right">
+                                <div class="card-body p-4 p-lg-5">
+                                    <div class="text-center mb-4 fade-in">
+                                        <h3 class="fw-bold">Sign In</h3>
+                                        <p class="text-muted">Welcome back to Stride</p>
+                                    </div>
+
+                                    {% with messages = get_flashed_messages(with_categories=true) %}
+                                        {% if messages %}
+                                            {% for category, message in messages %}
+                                                <div class="alert alert-{{ category }} alert-dismissible fade show rounded-3 fade-in delay-1" role="alert">
+                                                    {{ message }}
+                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endwith %}
+
+                                    <form method="POST" action="{{ url_for('auth.login') }}" class="fade-in delay-2">
+                                        {{ form.csrf_token }}
+                                        <div class="form-floating mb-3">
+                                            {{ form.email(class="form-control custom-input", placeholder="name@example.com") }}
+                                            <label for="email">
+                                                <i class="ri-mail-line me-2"></i>Email address
+                                            </label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            {{ form.password(class="form-control custom-input", placeholder="Password") }}
+                                            <label for="password">
+                                                <i class="ri-lock-line me-2"></i>Password
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="d-flex justify-content-end mb-4">
+                                            <a href="{{ url_for('auth.forgot_password') }}" class="text-decoration-none text-primary">
+                                                <i class="ri-question-line me-1"></i>Forgot Password?
+                                            </a>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary w-100 py-3 mb-4 rounded-3">
+                                            Sign In
+                                        </button>
+
+                                        <div class="position-relative mb-4">
+                                            <hr class="text-muted">
+                                            <span class="position-absolute top-50 start-50 translate-middle px-3 bg-white text-muted">
+                                                or continue with
+                                            </span>
+                                        </div>
+
+                                        <a href="{{ url_for('google.login') }}" 
+                                           class="btn btn-outline-secondary w-100 py-3 mb-4 rounded-3 d-flex align-items-center justify-content-center gap-2">
+                                            <img src="{{ url_for('static', filename='img/google.png') }}" alt="Google" width="20">
+                                            <span class="fw-medium">Continue with Google</span>
+                                        </a>
+
+                                        <p class="text-center text-muted mb-0">
+                                            Don't have an account? 
+                                            <a href="{{ url_for('auth.signup') }}" class="text-decoration-none text-primary page-transition">Sign Up</a>
+                                        </p>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Base Styles */
+.auth-wrapper {
+    perspective: 1000px;
+}
+
+.card {
+    transform-style: preserve-3d;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Animation Classes */
+.slide-in-right {
+    animation: slideInRight 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards;
+}
+
+/* Delays */
+.delay-1 { animation-delay: 0.2s; }
+.delay-2 { animation-delay: 0.4s; }
+.delay-3 { animation-delay: 0.6s; }
+.delay-4 { animation-delay: 0.8s; }
+.delay-5 { animation-delay: 1s; }
+
+/* Page Transition */
+.page-transition {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.page-transition::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background: #9370DB;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.page-transition:hover::after {
+    transform: scaleX(1);
+}
+
+/* Keyframes */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Input and Button Styles */
+.custom-input {
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.custom-input:focus {
+    border-color: #9370DB;
+    box-shadow: 0 0 0 0.2rem rgba(147, 112, 219, 0.25);
+    transform: translateY(-1px);
+}
+
+.custom-input:hover {
+    border-color: #9370DB;
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: #9370DB;
+    border: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: #8a68cc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(147, 112, 219, 0.25);
+}
+
+.btn-outline-secondary {
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+    background: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Alert Styles */
+.alert {
+    border: none;
+    animation: slideInRight 0.5s ease forwards;
+}
+
+.alert-success {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.alert-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* Card Hover Effect */
+.card:hover {
+    transform: translateY(-5px) rotateX(2deg);
+    box-shadow: 0 20px 40px rgba(147, 112, 219, 0.15) !important;
+}
+
+/* Link Hover Effect */
+a {
+    transition: all 0.3s ease;
+    color: #9370DB !important;
+}
+
+a:hover {
+    color: #8a68cc !important;
+}
+
+/* Text Colors */
+.text-primary {
+    color: #9370DB !important;
+}
+</style>
+{% endblock %}

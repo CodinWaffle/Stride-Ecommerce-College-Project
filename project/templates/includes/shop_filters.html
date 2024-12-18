@@ -1,0 +1,232 @@
+<div class="filter-card">
+    <div class="d-flex d-lg-none justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Filters</h5>
+        <button class="btn btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+            <i class="fas fa-sliders-h"></i>
+        </button>
+    </div>
+
+    <div class="collapse d-lg-block" id="filterCollapse">
+        <form action="{{ url_for('main.shop') }}" method="GET" id="filterForm">
+            <!-- Price Range -->
+            <div class="filter-section">
+                <h6 class="filter-title">Price Range</h6>
+                <div class="price-range-wrapper">
+                    <div class="price-range-inputs mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text border-end-0">₱</span>
+                            <input type="number" 
+                                   id="minPrice"
+                                   name="min_price" 
+                                   class="form-control border-start-0" 
+                                   placeholder="Min" 
+                                   min="0"
+                                   value="{{ request.args.get('min_price', '') }}">
+                        </div>
+                        <div class="divider">-</div>
+                        <div class="input-group">
+                            <span class="input-group-text border-end-0">₱</span>
+                            <input type="number" 
+                                   id="maxPrice"
+                                   name="max_price" 
+                                   class="form-control border-start-0" 
+                                   placeholder="Max" 
+                                   min="0"
+                                   value="{{ request.args.get('max_price', '') }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sort Options -->
+            <div class="filter-section">
+                <h6 class="filter-title">Sort By</h6>
+                <select name="sort" id="sortSelect" class="form-select">
+                    <option value="">Latest First</option>
+                    <option value="price_low" {% if request.args.get('sort') == 'price_low' %}selected{% endif %}>
+                        Price: Low to High
+                    </option>
+                    <option value="price_high" {% if request.args.get('sort') == 'price_high' %}selected{% endif %}>
+                        Price: High to Low
+                    </option>
+                    <option value="popular" {% if request.args.get('sort') == 'popular' %}selected{% endif %}>
+                        Most Popular
+                    </option>
+                </select>
+            </div>
+
+            <button type="submit" id="applyFilters" class="btn btn-primary w-100 rounded-pill">
+                Apply Filters
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+.filter-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 2rem;
+}
+
+.filter-section {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--bs-gray-100);
+    border-radius: 0.75rem;
+}
+
+.filter-title {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--bs-gray-800);
+    font-size: 0.95rem;
+}
+
+.price-range-wrapper {
+    position: relative;
+}
+
+.price-range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.input-group {
+    flex: 1;
+    background: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.input-group-text {
+    background: white;
+    color: var(--bs-gray-600);
+    font-size: 0.9rem;
+    border: none;
+    padding-right: 0;
+}
+
+.form-control {
+    border: none;
+    font-size: 0.9rem;
+    padding: 0.625rem;
+    background: white;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    background: white;
+}
+
+.divider {
+    color: var(--bs-gray-500);
+    font-weight: 500;
+}
+
+.form-select {
+    border: none;
+    font-size: 0.9rem;
+    padding: 0.625rem;
+    background-color: white;
+    border-radius: 0.5rem;
+}
+
+.form-select:focus {
+    box-shadow: none;
+    border-color: var(--bs-primary);
+}
+
+.btn-primary {
+    padding: 0.625rem 1.25rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 991.98px) {
+    .filter-card {
+        position: relative;
+        top: 0;
+        margin-bottom: 1rem;
+        padding: 1rem;
+    }
+    
+    .price-range-inputs {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .divider {
+        display: none;
+    }
+    
+    .categories-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .category-card {
+        padding: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .categories-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .filter-section {
+        padding: 0.75rem;
+    }
+    
+    .form-select, .form-control {
+        font-size: 0.875rem;
+    }
+    
+    .filter-title {
+        font-size: 0.875rem;
+    }
+}
+
+.sticky-filters {
+    position: sticky;
+    top: 1rem;
+    z-index: 100;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle sticky filters on mobile
+    const filterCard = document.querySelector('.filter-card');
+    const mediaQuery = window.matchMedia('(max-width: 991.98px)');
+    
+    function handleStickyFilters(e) {
+        if (e.matches) {
+            filterCard.classList.remove('sticky-filters');
+        } else {
+            filterCard.classList.add('sticky-filters');
+        }
+    }
+    
+    mediaQuery.addListener(handleStickyFilters);
+    handleStickyFilters(mediaQuery);
+    
+    // Close filter collapse when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+        const filterCollapse = document.getElementById('filterCollapse');
+        const filterCard = document.querySelector('.filter-card');
+        
+        if (!filterCard.contains(event.target) && window.innerWidth < 992) {
+            const bsCollapse = bootstrap.Collapse.getInstance(filterCollapse);
+            if (bsCollapse && filterCollapse.classList.contains('show')) {
+                bsCollapse.hide();
+            }
+        }
+    });
+});
+</script>

@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Create New Product</h2>
+            <p class="text-muted mb-0">Add a new product to your store</p>
+        </div>
+        <a href="{{ url_for('product.manage_products') }}" class="btn btn-light rounded-pill hover-lift">
+            <i class="fas fa-arrow-left me-2"></i>Back to Products
+        </a>
+    </div>
+
+    <!-- Product Form -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <!-- Basic Information -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Basic Information</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Product Name</label>
+                                <input type="text" name="name" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea name="description" class="form-control" rows="4" required></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Pricing and Inventory -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Pricing & Inventory</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₱</span>
+                                        <input type="number" name="price" class="form-control" step="0.01" min="0" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Stock</label>
+                                    <input type="number" name="stock" class="form-control" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Category</h5>
+                            <select name="category_id" class="form-select" required>
+                                <option value="">Select a category</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Images -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Product Images</h5>
+                            <div class="upload-area p-4 rounded-4 bg-light border border-2 border-dashed position-relative">
+                                <input type="file" class="d-none" id="productImages" name="product_images" 
+                                       multiple accept="image/*" onchange="previewImages(this)" required>
+                                <div class="text-center" id="uploadPrompt">
+                                    <i class="fas fa-cloud-upload-alt fa-2x text-primary mb-3"></i>
+                                    <p class="mb-1">Drag & drop your product images here</p>
+                                    <small class="text-muted d-block mb-3">or</small>
+                                    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-4"
+                                            onclick="document.getElementById('productImages').click()">
+                                        Browse Files
+                                    </button>
+                                </div>
+                                <div id="imagePreview" class="d-flex flex-wrap gap-3 mt-3"></div>
+                            </div>
+                            <div class="form-text mt-2">
+                                <ul class="mb-0">
+                                    <li>The first image will be used as the main product image</li>
+                                    <li>You can select multiple images at once (maximum 5 images)</li>
+                                    <li>Supported formats: PNG, JPG, JPEG</li>
+                                    <li>Maximum file size: 5MB per image</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill">
+                                <i class="fas fa-plus me-2"></i>Create Product
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tips Section -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 bg-light">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>Tips
+                    </h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Use high-quality images for better visibility
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Write detailed descriptions to help customers
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Set competitive prices
+                        </li>
+                        <li>
+                            <i class="fas fa-check text-success me-2"></i>
+                            Keep your inventory updated
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-lift {
+    transition: transform 0.2s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+}
+
+/* Upload Area Styles */
+.upload-area {
+    min-height: 250px;
+    transition: all 0.3s ease;
+    border-style: dashed !important;
+}
+
+.upload-area.drag-over {
+    border-color: var(--bs-primary) !important;
+    background-color: rgba(var(--bs-primary-rgb), 0.05) !important;
+}
+
+.upload-area:hover {
+    border-color: var(--bs-primary) !important;
+}
+
+/* Image Preview Styles */
+.image-preview-container {
+    position: relative;
+    width: 120px;
+}
+
+.preview-image {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.preview-image:hover {
+    transform: scale(1.05);
+}
+
+.remove-image {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.remove-image:hover {
+    background: var(--bs-danger);
+    color: white;
+}
+
+.main-image-badge {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+}
+</style>
+
+<script>
+// Initialize drag and drop functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.querySelector('.upload-area');
+    const imageInput = document.getElementById('productImages');
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+        uploadArea.classList.add('drag-over');
+    }
+
+    function unhighlight(e) {
+        uploadArea.classList.remove('drag-over');
+    }
+
+    uploadArea.addEventListener('drop', handleDrop, false);
+});
+
+function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    const input = document.getElementById('productImages');
+    
+    if (validateFiles(files)) {
+        const dataTransfer = new DataTransfer();
+        
+        // Add existing files first
+        if (input.files) {
+            Array.from(input.files).forEach(file => {
+                dataTransfer.items.add(file);
+            });
+        }
+        
+        // Add new files
+        Array.from(files).forEach(file => {
+            dataTransfer.items.add(file);
+        });
+        
+        input.files = dataTransfer.files;
+        previewImages(input);
+    }
+}
+
+function validateFiles(files) {
+    const totalFiles = document.getElementById('imagePreview').children.length + files.length;
+    if (totalFiles > 5) {
+        alert('Maximum 5 images allowed');
+        return false;
+    }
+
+    for (let file of files) {
+        if (!file.type.startsWith('image/')) {
+            alert('Only image files are allowed');
+            return false;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Image size should not exceed 5MB');
+            return false;
+        }
+    }
+    return true;
+}
+
+function previewImages(input) {
+    const preview = document.getElementById('imagePreview');
+    const uploadPrompt = document.getElementById('uploadPrompt');
+    
+    if (input.files && input.files.length > 0) {
+        if (!validateFiles(input.files)) {
+            input.value = '';
+            return;
+        }
+
+        preview.innerHTML = '';
+        uploadPrompt.style.display = 'none';
+
+        Array.from(input.files).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const container = document.createElement('div');
+                container.className = 'image-preview-container';
+                container.innerHTML = `
+                    <img src="${e.target.result}" class="preview-image" alt="Product image">
+                    <div class="remove-image" onclick="removeImage(${index})">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    ${index === 0 ? '<div class="main-image-badge">Main Image</div>' : ''}
+                `;
+                preview.appendChild(container);
+            };
+            reader.readAsDataURL(file);
+        });
+    } else {
+        preview.innerHTML = '';
+        uploadPrompt.style.display = 'block';
+    }
+}
+
+function removeImage(index) {
+    const input = document.getElementById('productImages');
+    const dataTransfer = new DataTransfer();
+    
+    Array.from(input.files).forEach((file, i) => {
+        if (i !== index) {
+            dataTransfer.items.add(file);
+        }
+    });
+    
+    input.files = dataTransfer.files;
+    previewImages(input);
+}
+</script>
+{% endblock %} 

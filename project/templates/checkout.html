@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Checkout Form -->
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 shadow rounded-4">
+                <div class="card-header bg-primary text-white py-3 rounded-top-4">
+                    <h2 class="h4 fw-bold m-0">Checkout Details</h2>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" id="checkoutForm" novalidate>
+                        {{ form.csrf_token }}
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        
+                        <!-- Shipping Information -->
+                        <h5 class="fw-bold mb-4">Shipping Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">{{ form.full_name.label }}</label>
+                                {{ form.full_name(class="form-control" + (" is-invalid" if form.full_name.errors else "")) }}
+                                {% if form.full_name.errors %}
+                                    {% for error in form.full_name.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">{{ form.phone.label }}</label>
+                                {{ form.phone(class="form-control" + (" is-invalid" if form.phone.errors else "")) }}
+                                {% if form.phone.errors %}
+                                    {% for error in form.phone.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">{{ form.email.label }}</label>
+                                {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                                {% if form.email.errors %}
+                                    {% for error in form.email.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">{{ form.address.label }}</label>
+                                {{ form.address(class="form-control" + (" is-invalid" if form.address.errors else ""), rows=3) }}
+                                {% if form.address.errors %}
+                                    {% for error in form.address.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Payment Information -->
+                        <h5 class="fw-bold mb-4">Payment Information</h5>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Payment processing will be implemented in the next phase.
+                        </div>
+
+                        <!-- Order Items -->
+                        <h5 class="fw-bold mb-4">Order Items</h5>
+                        {% if cart_items %}
+                            {% for item in cart_items %}
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="{{ url_for('static', filename=item.product.image_main) }}" 
+                                     alt="{{ item.product.name }}"
+                                     onerror="this.src='{{ url_for('static', filename='img/shoes1.png') }}'"
+                                     class="rounded-3 me-3"
+                                     style="width: 60px; height: 60px; object-fit: cover;">
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold mb-0">{{ item.product.name }}</h6>
+                                    <p class="text-muted small mb-0">
+                                        Quantity: {{ item.quantity }}
+                                        {% if item.size %}
+                                        <span class="mx-1">•</span>Size: {{ item.size }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="text-end">
+                                    <p class="fw-bold mb-0">₱{{ "%.2f"|format(item.product.price * item.quantity) }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                No items in checkout
+                            </div>
+                        {% endif %}
+
+                        <hr class="my-4">
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-lock me-2"></i>Place Order
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow rounded-4 position-sticky" style="top: 2rem;">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-4">Order Summary</h4>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Subtotal</span>
+                        <span class="fw-bold">₱{{ "%.2f"|format(subtotal) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Shipping</span>
+                        <span class="fw-bold">₱{{ "%.2f"|format(shipping) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Tax (12%)</span>
+                        <span class="fw-bold">₱{{ "%.2f"|format(tax) }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="h5 fw-bold m-0">Total</span>
+                        <span class="h5 fw-bold text-primary m-0">₱{{ "%.2f"|format(total) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+}
+
+.alert {
+    margin-bottom: 1rem;
+}
+
+.alert-dismissible .btn-close {
+    padding: 1.25rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('checkoutForm');
+    
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        const requiredFields = form.querySelectorAll('[required]');
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                isValid = false;
+                field.classList.add('is-invalid');
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please fill in all required fields');
+        }
+    });
+});
+</script>
+{% endblock %} 

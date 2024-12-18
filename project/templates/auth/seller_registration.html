@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <h2 class="h3 mb-2">Become a Seller</h2>
+                        <p class="text-muted">Set up your store and start selling today</p>
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Profile Image Upload -->
+                        <div class="text-center mb-4">
+                            <div class="position-relative d-inline-block">
+                                <img id="profilePreview" 
+                                     src="{{ url_for('static', filename='img/placeholder-profile.jpg') }}" 
+                                     class="rounded-circle border"
+                                     width="120" 
+                                     height="120"
+                                     style="object-fit: cover;">
+                                <label for="profile_image" class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle p-2" style="cursor: pointer;">
+                                    <i class="fas fa-camera"></i>
+                                </label>
+                                {{ form.profile_image(class="d-none", onchange="previewImage(this)") }}
+                            </div>
+                        </div>
+
+                        <!-- Store Information -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">Store Information</h5>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        {{ form.store_name(class="form-control", placeholder="Store Name") }}
+                                        <label for="store_name">
+                                            <i class="ri-store-2-line me-2"></i>Store Name
+                                        </label>
+                                    </div>
+                                    {% if form.store_name.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.store_name.errors[0] }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        {{ form.store_description(class="form-control", style="height: 120px", placeholder="Store Description") }}
+                                        <label for="store_description">
+                                            <i class="ri-file-text-line me-2"></i>Store Description
+                                        </label>
+                                    </div>
+                                    {% if form.store_description.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.store_description.errors[0] }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">Contact Information</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        {{ form.phone(class="form-control", placeholder="Business Phone") }}
+                                        <label for="phone">
+                                            <i class="ri-phone-line me-2"></i>Business Phone
+                                        </label>
+                                    </div>
+                                    {% if form.phone.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.phone.errors[0] }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-floating">
+                                        {{ form.business_address(class="form-control", placeholder="Business Address") }}
+                                        <label for="business_address">
+                                            <i class="ri-map-pin-line me-2"></i>Business Address
+                                        </label>
+                                    </div>
+                                    {% if form.business_address.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.business_address.errors[0] }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary btn-lg rounded-pill") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('profilePreview').src = e.target.result;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+
+<style>
+.form-floating > label {
+    padding-left: 1.5rem;
+}
+.form-floating > .form-control {
+    padding-left: 1.5rem;
+}
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(147, 112, 219, 0.25);
+}
+</style>
+{% endblock %} 

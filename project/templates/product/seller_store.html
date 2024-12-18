@@ -1,0 +1,406 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Add this style section at the top of the file -->
+<style>
+:root {
+    --primary-color: #9370DB;
+    --primary-dark: #7B5DD3;
+    --primary-light: rgba(147, 112, 219, 0.1);
+    --primary-hover: #8A2BE2;
+}
+
+.store-hero {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    padding: 3rem 0;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.store-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5z' fill='white' fill-opacity='0.1'/%3E%3C/svg%3E");
+    opacity: 0.5;
+    animation: animatePattern 30s linear infinite;
+}
+
+@keyframes animatePattern {
+    0% { background-position: 0 0; }
+    100% { background-position: 100% 100%; }
+}
+
+.card {
+    border: none;
+    box-shadow: 0 4px 24px rgba(147, 112, 219, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 32px rgba(147, 112, 219, 0.15);
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(147, 112, 219, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(147, 112, 219, 0.25);
+}
+
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(147, 112, 219, 0.25);
+}
+
+.badge {
+    padding: 0.5em 1em;
+}
+
+.badge.bg-primary {
+    background: var(--primary-color) !important;
+}
+
+.badge.bg-primary-subtle {
+    background: var(--primary-light) !important;
+    color: var(--primary-dark) !important;
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.verified-badge {
+    background: var(--primary-color);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    box-shadow: 0 2px 8px rgba(147, 112, 219, 0.3);
+}
+
+.stat-item {
+    background: var(--primary-light);
+    padding: 1rem;
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    background: rgba(147, 112, 219, 0.15);
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.filter-tag {
+    background: var(--primary-light);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.filter-tag:hover {
+    background: rgba(147, 112, 219, 0.15);
+}
+
+.pagination .page-link {
+    color: var(--primary-color);
+    border: none;
+    margin: 0 2px;
+    border-radius: 0.5rem;
+}
+
+.pagination .page-link:hover {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--primary-color);
+    color: white;
+}
+
+.nav-pills .nav-link.active {
+    background: var(--primary-color);
+}
+
+.nav-pills .nav-link {
+    color: var(--primary-color);
+}
+
+.product-card {
+    border: none;
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(147, 112, 219, 0.15);
+}
+
+.product-card .card-body {
+    padding: 1.5rem;
+}
+
+.price {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.rating .fas.fa-star {
+    color: #FFD700;
+}
+
+@media (max-width: 768px) {
+    .store-hero {
+        padding: 2rem 0;
+    }
+    
+    .stat-item {
+        padding: 0.75rem;
+    }
+    
+    .stat-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+}
+</style>
+
+<!-- Hero Section -->
+<section class="store-hero py-4">
+    <div class="container">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <div class="col-lg-12">
+                        <div class="d-flex flex-column flex-sm-row align-items-center text-center text-sm-start">
+                            <div class="position-relative mb-3 mb-sm-0">
+                                <img src="{{ url_for('static', filename=seller.profile_image or 'img/placeholder-profile.jpg') }}" 
+                                     class="rounded-circle seller-profile" 
+                                     alt="{{ seller.username }}"
+                                     width="96" 
+                                     height="96">
+                                {% if seller.is_verified %}
+                                <div class="verified-badge">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="ms-sm-4">
+                                <div class="d-flex flex-column flex-sm-row align-items-center gap-2 mb-3">
+                                    <h1 class="seller-name mb-0">{{ seller.store_name or seller.username }}</h1>
+                                    {% if seller.is_verified %}
+                                    <span class="badge bg-success px-3">
+                                        <i class="fas fa-check-circle me-1"></i>Verified Seller
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div class="seller-meta d-flex flex-column flex-sm-row align-items-center gap-3">
+                                    <div class="rating-summary">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="stars">
+                                                {% for i in range(5) %}
+                                                <i class="fas fa-star {% if i < avg_rating|default(0) %}text-warning{% else %}text-muted opacity-25{% endif %}"></i>
+                                                {% endfor %}
+                                            </div>
+                                            <span class="rating-value">{{ "%.1f"|format(avg_rating|default(0)) }}</span>
+                                            <span class="text-muted">({{ review_count|default(0) }} reviews)</span>
+                                        </div>
+                                    </div>
+                                    <div class="separator d-none d-sm-block">•</div>
+                                    <div class="stat-item">
+                                        <i class="fas fa-box text-primary"></i>
+                                        <span>{{ seller.products|length }} Products</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Follow Button -->
+<div class="position-absolute top-0 end-0 m-4">
+    {% if current_user.is_authenticated and current_user.id != seller.id %}
+        <button id="followBtn" 
+                class="btn {% if is_following %}btn-primary{% else %}btn-outline-primary{% endif %} rounded-pill px-4 py-2"
+                onclick="toggleFollow('{{ seller.id }}')">
+            <i class="fas {% if is_following %}fa-user-check{% else %}fa-user-plus{% endif %} me-2"></i>
+            <span id="followText">{% if is_following %}Following{% else %}Follow{% endif %}</span>
+        </button>
+    {% endif %}
+</div>
+
+<!-- Store Content -->
+<div class="container py-5">
+    <!-- Search and Filter Section -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+            <form action="{{ url_for('product.seller_store', username=seller.username) }}" method="GET" id="filterForm">
+                <div class="row g-3">
+                    <!-- Search Bar -->
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="search" 
+                                   class="form-control border-start-0" 
+                                   name="q" 
+                                   placeholder="Search products..." 
+                                   value="{{ request.args.get('q', '') }}"
+                                   autocomplete="off">
+                            <button type="submit" class="btn btn-primary px-4">
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Price Filter -->
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input type="number" 
+                                   class="form-control" 
+                                   name="min_price" 
+                                   placeholder="Min" 
+                                   value="{{ request.args.get('min_price', '') }}">
+                            <span class="input-group-text bg-white">-</span>
+                            <input type="number" 
+                                   class="form-control" 
+                                   name="max_price" 
+                                   placeholder="Max" 
+                                   value="{{ request.args.get('max_price', '') }}">
+                        </div>
+                    </div>
+                    <!-- Sort Options -->
+                    <div class="col-md-3">
+                        <select name="sort" class="form-select" onchange="this.form.submit()">
+                            <option value="newest" {% if request.args.get('sort') == 'newest' %}selected{% endif %}>Latest</option>
+                            <option value="price_low" {% if request.args.get('sort') == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                            <option value="price_high" {% if request.args.get('sort') == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="row g-4">
+        {% for product in products.items %}
+        <div class="col-6 col-md-4 col-lg-3">
+            {% include 'includes/product_card.html' %}
+        </div>
+        {% else %}
+        <div class="col-12 text-center py-5">
+            <div class="empty-state">
+                <i class="fas fa-box fa-3x text-muted mb-3"></i>
+                <h5>No Products Found</h5>
+                <p class="text-muted">This seller hasn't added any products yet.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if products.pages > 1 %}
+    <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% for page_num in products.iter_pages() %}
+            {% if page_num %}
+            <li class="page-item {% if page_num == products.page %}active{% endif %}">
+                <a class="page-link rounded-pill" 
+                   href="{{ url_for('product.seller_store', username=seller.username, page=page_num, q=request.args.get('q', ''), sort=request.args.get('sort', '')) }}">
+                    {{ page_num }}
+                </a>
+            </li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<script>
+function searchProducts() {
+    const searchQuery = document.getElementById('searchInput').value;
+    const sort = document.getElementById('sortBy').value;
+    
+    let url = new URL(window.location.href);
+    if (searchQuery) url.searchParams.set('q', searchQuery);
+    if (sort) url.searchParams.set('sort', sort);
+    
+    // Remove price parameters if they exist
+    url.searchParams.delete('min_price');
+    url.searchParams.delete('max_price');
+    
+    window.location.href = url.toString();
+}
+
+function filterProducts() {
+    searchProducts();
+}
+
+function setLoadingState(button, loading) {
+    if (loading) {
+        button.setAttribute('disabled', 'disabled');
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+    } else {
+        button.removeAttribute('disabled');
+        button.innerHTML = button.getAttribute('data-original-text');
+    }
+}
+</script>
+{% endblock %}

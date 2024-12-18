@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #9370DB 0%, #8A2BE2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #fff;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 0 0 10px 10px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #9370DB;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Welcome to Stride Sellers!</h1>
+    </div>
+    <div class="content">
+        <p>Dear {{ user.username }},</p>
+        
+        <p>Welcome to Stride Sellers! We're excited to have you join our community of sellers with your store "{{ store_name }}".</p>
+        
+        <h2>What's Next?</h2>
+        <ol>
+            <li>Your seller account is currently under review. We'll notify you once it's approved.</li>
+            <li>In the meantime, you can start setting up your store profile and preparing your product listings.</li>
+            <li>Once approved, you can start listing products and making sales!</li>
+        </ol>
+
+        <h2>Quick Tips for Success</h2>
+        <ul>
+            <li>Complete your store profile with high-quality images and detailed descriptions</li>
+            <li>Prepare clear, attractive product photos</li>
+            <li>Write detailed product descriptions</li>
+            <li>Set competitive prices</li>
+            <li>Provide excellent customer service</li>
+        </ul>
+
+        <p>
+            <a href="{{ url_for('product.seller_dashboard', _external=True) }}" class="button">
+                Visit Your Seller Dashboard
+            </a>
+        </p>
+
+        <p>If you have any questions or need assistance, don't hesitate to contact our seller support team.</p>
+
+        <p>Best regards,<br>The Stride Team</p>
+    </div>
+    <div class="footer">
+        <p>This email was sent to {{ user.business_email }}</p>
+        <p>© {{ now.year }} Stride. All rights reserved.</p>
+    </div>
+</body>
+</html> 

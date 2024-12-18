@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-4">Track Order #{{ order.id }}</h4>
+                    
+                    <!-- Order Info -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <div>
+                                <small class="text-muted d-block">Tracking Number</small>
+                                <span class="fw-bold">{{ order.tracking_number }}</span>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Courier</small>
+                                <span class="fw-bold">{{ order.courier }}</span>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Estimated Delivery</small>
+                                <span class="fw-bold">
+                                    {% if order.estimated_delivery %}
+                                        {{ order.estimated_delivery.strftime('%B %d, %Y') }}
+                                    {% else %}
+                                        Pending
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tracking Timeline -->
+                    <div class="tracking-timeline">
+                        {% for update in tracking_updates %}
+                        <div class="tracking-item">
+                            <div class="tracking-icon">
+                                <div class="tracking-dot {% if loop.first %}active{% endif %}"></div>
+                            </div>
+                            <div class="tracking-content">
+                                <h6 class="fw-bold mb-1">{{ update.status }}</h6>
+                                <p class="mb-1">{{ update.description }}</p>
+                                <small class="text-muted">
+                                    {{ update.location }} - {{ update.timestamp.strftime('%B %d, %Y %I:%M %p') }}
+                                </small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.tracking-timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.tracking-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+}
+
+.tracking-icon {
+    position: absolute;
+    left: -30px;
+    top: 0;
+    width: 20px;
+    height: 20px;
+}
+
+.tracking-dot {
+    width: 12px;
+    height: 12px;
+    background: #dee2e6;
+    border-radius: 50%;
+    position: relative;
+}
+
+.tracking-dot.active {
+    background: #0d6efd;
+}
+
+.tracking-dot:after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 12px;
+    width: 2px;
+    height: calc(100% + 1.5rem);
+    background: #dee2e6;
+}
+
+.tracking-item:last-child .tracking-dot:after {
+    display: none;
+}
+</style>
+{% endblock %} 

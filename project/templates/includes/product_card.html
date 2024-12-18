@@ -1,0 +1,50 @@
+<div class="card product-card border-0 h-100">
+    <div class="position-relative">
+        <!-- Badges -->
+        <div class="card-badges position-absolute top-0 start-0 p-3 z-1">
+            {% if product.discount_price %}
+            <span class="badge bg-danger rounded-pill">
+                -{{ ((product.price - product.discount_price) / product.price * 100) | round }}%
+            </span>
+            {% endif %}
+        </div>
+        
+        <div class="position-absolute top-0 end-0 p-3 z-1">
+            <span class="badge bg-primary-light text-primary rounded-pill">
+                {{ product.sold_count or 0 }} sold
+            </span>
+        </div>
+
+        <!-- Product Image -->
+        <div class="product-image-wrapper">
+            <a href="{{ url_for('product.product_detail', id=product.id) }}">
+                <img src="{{ url_for('static', filename=product.image_main) }}" 
+                     class="product-img" 
+                     alt="{{ product.name }}"
+                     onerror="this.src=`{{ url_for('static', filename='img/shoes1.png') }}`">
+            </a>
+        </div>
+    </div>
+    
+    <div class="card-body p-3">
+        <h6 class="product-title mb-1">
+            <a href="{{ url_for('product.product_detail', id=product.id) }}" 
+               class="text-dark text-decoration-none">{{ product.name }}</a>
+        </h6>
+
+        <div class="d-flex justify-content-between align-items-center mt-2">
+            <div class="price-container">
+                {% if product.discount_price %}
+                <span class="text-danger fw-bold">₱{{ "%.2f"|format(product.discount_price) }}</span>
+                <small class="text-muted text-decoration-line-through ms-2">₱{{ "%.2f"|format(product.price) }}</small>
+                {% else %}
+                <span class="text-primary fw-bold">₱{{ "%.2f"|format(product.price) }}</span>
+                {% endif %}
+            </div>
+            <div class="rating">
+                <i class="fas fa-star text-warning"></i>
+                <span class="ms-1">{{ "%.1f"|format(product.rating if product.rating is not none else 0) }}</span>
+            </div>
+        </div>
+    </div>
+</div>

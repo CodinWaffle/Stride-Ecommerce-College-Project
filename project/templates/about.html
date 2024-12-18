@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <h1 class="display-4 mb-4">About Stride</h1>
+            <p class="lead text-muted">Your trusted marketplace for quality products and exceptional service.</p>
+        </div>
+    </div>
+
+    <!-- Mission Section -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-5">
+                    <h2 class="h3 mb-4">Our Mission</h2>
+                    <p class="text-muted">At Stride, we're committed to creating a seamless and trustworthy marketplace where buyers and sellers can connect with confidence. Our platform is built on the principles of transparency, security, and customer satisfaction.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-shield-alt fa-2x text-primary"></i>
+                    </div>
+                    <h3 class="h5 mb-3">Secure Transactions</h3>
+                    <p class="text-muted mb-0">Every transaction is protected with state-of-the-art security measures.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-user-check fa-2x text-primary"></i>
+                    </div>
+                    <h3 class="h5 mb-3">Verified Sellers</h3>
+                    <p class="text-muted mb-0">All our sellers go through a thorough verification process.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-headset fa-2x text-primary"></i>
+                    </div>
+                    <h3 class="h5 mb-3">24/7 Support</h3>
+                    <p class="text-muted mb-0">Our dedicated support team is always here to help you.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-4">
+            <h2 class="h3">Our Team</h2>
+            <p class="text-muted">Meet the people behind Stride</p>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body p-4">
+                    <img src="{{ url_for('static', filename='img/team/team-1.jpg') }}" alt="Team Member" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                    <h4 class="h5 mb-2">John Doe</h4>
+                    <p class="text-muted small mb-0">Founder & CEO</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body p-4">
+                    <img src="{{ url_for('static', filename='img/team/team-2.jpg') }}" alt="Team Member" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                    <h4 class="h5 mb-2">Jane Smith</h4>
+                    <p class="text-muted small mb-0">Head of Operations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body p-4">
+                    <img src="{{ url_for('static', filename='img/team/team-3.jpg') }}" alt="Team Member" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                    <h4 class="h5 mb-2">Mike Johnson</h4>
+                    <p class="text-muted small mb-0">Lead Developer</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+<style>
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+</style>
+{% endblock %} 

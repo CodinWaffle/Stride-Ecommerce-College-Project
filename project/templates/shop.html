@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="shop-wrapper bg-light">
+    <div class="container py-5">
+        <!-- Categories Section -->
+        <div class="categories-section mb-5">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Our Collections</h2>
+                    <p class="text-muted mb-0">Find your perfect pair from our categories</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <span class="badge bg-primary-light text-primary rounded-pill px-3 py-2">
+                        {{ categories|length }} Categories
+                    </span>
+                </div>
+            </div>
+            
+            <div class="categories-grid">
+                <a href="{{ url_for('main.shop') }}" 
+                   class="category-card {% if not request.args.get('category') %}active{% endif %}">
+                    <div class="icon-wrapper">
+                        <div class="icon-circle">
+                            <i class="fas fa-th"></i>
+                        </div>
+                    </div>
+                    <h6 class="category-name">All Products</h6>
+                    <small class="category-count">View All</small>
+                </a>
+                
+                {% for category in categories %}
+                <a href="{{ url_for('main.shop', category=category.id) }}" 
+                   class="category-card {% if request.args.get('category')|int == category.id %}active{% endif %}">
+                    <div class="icon-wrapper">
+                        <div class="icon-circle">
+                            <i class="fas fa-{{ category.icon|default('tag') }}"></i>
+                        </div>
+                    </div>
+                    <h6 class="category-name">{{ category.name }}</h6>
+                    <small class="category-count">{{ category.products|length }} items</small>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Shop Content -->
+        <div class="row g-4">
+            <!-- Sidebar -->
+            <div class="col-lg-3">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+                        {% include 'includes/shop_filters.html' %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="col-lg-9">
+                <div id="productsContainer" class="row g-4">
+                    {% include 'includes/product_grid.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.category-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: white;
+    border-radius: 1rem;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(147, 112, 219, 0.12);
+    border-color: transparent;
+}
+
+.category-card.active {
+    background: var(--bs-primary-bg-subtle);
+    color: var(--bs-primary);
+    border-color: transparent;
+}
+
+.icon-wrapper {
+    margin-bottom: 1rem;
+}
+
+.icon-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--bs-gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+}
+
+.category-card.active .icon-circle {
+    background: var(--bs-primary);
+    color: white;
+}
+
+.category-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.category-count {
+    color: var(--bs-gray-600);
+    font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+    .categories-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .category-card {
+        padding: 1rem;
+    }
+    
+    .icon-circle {
+        width: 40px;
+        height: 40px;
+    }
+}
+</style>
+{% endblock %}

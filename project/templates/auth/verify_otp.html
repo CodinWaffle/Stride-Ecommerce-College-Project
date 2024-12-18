@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="card shadow-lg border-0 rounded-4 bg-white">
+                <div class="card-body p-4 p-sm-5">
+                    <div class="text-center mb-5">
+                        <h3 class="fw-bold mb-2">Two-Step Verification</h3>
+                        <p class="text-muted">
+                            We sent a verification code to your email
+                        </p>
+                    </div>
+                    
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('auth.verify_otp') }}" id="otpForm">
+                        {{ form.csrf_token }}
+                        <div class="otp-inputs d-flex justify-content-between mb-5 px-md-8">
+                            {{ form.otp1(class="form-control text-center fw-bold fs-4 otp-input", style="width: 60px; height: 60px;", maxlength="1", inputmode="numeric", pattern="[0-9]*", autocomplete="one-time-code") }}
+                            {{ form.otp2(class="form-control text-center fw-bold fs-4 otp-input", style="width: 60px; height: 60px;", maxlength="1", inputmode="numeric", pattern="[0-9]*", autocomplete="one-time-code") }}
+                            {{ form.otp3(class="form-control text-center fw-bold fs-4 otp-input", style="width: 60px; height: 60px;", maxlength="1", inputmode="numeric", pattern="[0-9]*", autocomplete="one-time-code") }}
+                            {{ form.otp4(class="form-control text-center fw-bold fs-4 otp-input", style="width: 60px; height: 60px;", maxlength="1", inputmode="numeric", pattern="[0-9]*", autocomplete="one-time-code") }}
+                            {{ form.otp5(class="form-control text-center fw-bold fs-4 otp-input", style="width: 60px; height: 60px;", maxlength="1", inputmode="numeric", pattern="[0-9]*", autocomplete="one-time-code") }}
+                            {{ form.otp6(class="form-control text-center fw-bold fs-4 otp-input", style="width: 60px; height: 60px;", maxlength="1", inputmode="numeric", pattern="[0-9]*", autocomplete="one-time-code") }}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 py-3 mb-4 rounded-3 text-white fw-semibold">
+                            Verify Code
+                        </button>
+                    </form>
+                    
+                    <div class="text-center">
+                        <p class="text-muted mb-2">Didn't receive the code?</p>
+                        <a href="{{ url_for('auth.forgot_password') }}" class="btn btn-link fw-semibold text-decoration-none">
+                            Resend Code <i class="ri-refresh-line align-middle ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const otpInputs = document.querySelectorAll('.otp-input');
+    
+    otpInputs.forEach((input, index) => {
+        // Handle input
+        input.addEventListener('input', function(e) {
+            if (this.value.length === 1) {
+                if (index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            }
+        });
+        
+        // Handle backspace
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && !this.value && index > 0) {
+                otpInputs[index - 1].focus();
+            }
+        });
+        
+        // Handle paste
+        input.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pastedData = e.clipboardData.getData('text').slice(0, 6);
+            
+            if (/^\d+$/.test(pastedData)) {
+                pastedData.split('').forEach((digit, i) => {
+                    if (i < otpInputs.length) {
+                        otpInputs[i].value = digit;
+                        if (i < otpInputs.length - 1) {
+                            otpInputs[i + 1].focus();
+                        }
+                    }
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

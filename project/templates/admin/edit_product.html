@@ -1,0 +1,238 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Edit Product</h1>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Update your product information below.</p>
+    </div>
+
+    <!-- Main Form -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+        <form action="{{ url_for('admin.edit_product', product_id=product.id) }}" method="POST" enctype="multipart/form-data" class="divide-y divide-gray-200 dark:divide-gray-700">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <!-- Basic Information Section -->
+            <div class="p-6 space-y-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Basic Information</h3>
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Product Name -->
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Product Name</label>
+                        <input type="text" name="name" id="name" required value="{{ product.name }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                        <textarea name="description" id="description" rows="4" required
+                                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">{{ product.description }}</textarea>
+                    </div>
+
+                    <!-- Category -->
+                    <div>
+                        <label for="category_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+                        <select name="category_id" id="category_id" required
+                               class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            {% for category in categories %}
+                            <option value="{{ category.id }}" {% if product.category_id == category.id %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Price and Stock -->
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
+                            <label for="price" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Price</label>
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
+                                </div>
+                                <input type="number" name="price" id="price" step="0.01" required value="{{ product.price }}"
+                                       class="pl-7 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="stock" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Stock</label>
+                            <input type="number" name="stock" id="stock" required value="{{ product.stock }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image Section -->
+            <div class="p-6 space-y-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Product Image</h3>
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <!-- Current Image -->
+                    {% if product.image_main %}
+                    <div class="flex flex-col items-center justify-center">
+                        <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Current Image</span>
+                        <img src="{{ url_for('static', filename=product.image_main) }}" 
+                             alt="{{ product.name }}" 
+                             class="w-40 h-40 object-cover rounded-lg shadow-md"
+                             onerror="this.src=`{{ url_for('static', filename='img/default.png') }}`">
+                    </div>
+                    {% endif %}
+
+                    <!-- Upload New Image -->
+                    <div class="flex flex-col">
+                        <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Upload New Image</span>
+                        <div class="relative flex-1 flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-indigo-500 dark:hover:border-indigo-400 transition-colors duration-200"
+                             id="drop-zone"
+                             ondrop="dropHandler(event)"
+                             ondragover="dragOverHandler(event)"
+                             ondragleave="dragLeaveHandler(event)">
+                            
+                            <!-- Upload Instructions -->
+                            <div class="text-center p-4" id="upload-instructions">
+                                <svg class="mx-auto h-10 w-10 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <div class="mt-2">
+                                    <label for="image_main" class="cursor-pointer">
+                                        <span class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">
+                                            Click to upload
+                                        </span>
+                                        <input id="image_main" name="image_main" type="file" class="sr-only" accept="image/*" onchange="handleFileSelect(this)">
+                                    </label>
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">or drag and drop</p>
+                                    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                                </div>
+                            </div>
+
+                            <!-- Preview container -->
+                            <div id="preview-container" class="absolute inset-0 hidden">
+                                <div class="w-full h-full flex flex-col items-center justify-center p-4">
+                                    <div class="relative w-24 h-24">
+                                        <img id="preview-image" src="" alt="Preview" 
+                                             class="w-full h-full object-cover rounded-lg shadow-sm">
+                                    </div>
+                                    <div class="w-full text-center mt-2">
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2" id="file-name"></p>
+                                        <button type="button" onclick="removeImage()" 
+                                                class="inline-flex items-center px-2 py-1 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                                            <svg class="h-3 w-3 mr-1 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                            Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800 flex justify-end space-x-3">
+                <a href="{{ url_for('admin.products') }}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                    Cancel
+                </a>
+                <button type="submit" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const dropZone = document.getElementById('drop-zone');
+    const previewContainer = document.getElementById('preview-container');
+    const previewImage = document.getElementById('preview-image');
+    const fileInput = document.getElementById('image_main');
+    const fileName = document.getElementById('file-name');
+    const uploadInstructions = document.getElementById('upload-instructions');
+
+    function dragOverHandler(event) {
+        event.preventDefault();
+        dropZone.classList.add('border-indigo-500', 'dark:border-indigo-400');
+        dropZone.classList.remove('border-gray-300', 'dark:border-gray-600');
+    }
+
+    function dragLeaveHandler(event) {
+        event.preventDefault();
+        dropZone.classList.remove('border-indigo-500', 'dark:border-indigo-400');
+        dropZone.classList.add('border-gray-300', 'dark:border-gray-600');
+    }
+
+    function dropHandler(event) {
+        event.preventDefault();
+        dropZone.classList.remove('border-indigo-500', 'dark:border-indigo-400');
+        dropZone.classList.add('border-gray-300', 'dark:border-gray-600');
+
+        const file = event.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            handleFile(file);
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+        } else {
+            alert('Please upload an image file (PNG, JPG, GIF)');
+        }
+    }
+
+    function handleFileSelect(input) {
+        if (input.files && input.files[0]) {
+            handleFile(input.files[0]);
+        }
+    }
+
+    function handleFile(file) {
+        if (file.size > 10 * 1024 * 1024) {
+            alert('File is too large. Maximum size is 10MB.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            fileName.textContent = `${file.name} (${formatFileSize(file.size)})`;
+            uploadInstructions.classList.add('hidden');
+            previewContainer.classList.remove('hidden');
+            
+            // Add fade-in effect
+            previewContainer.style.opacity = '0';
+            setTimeout(() => {
+                previewContainer.style.opacity = '1';
+                previewContainer.style.transition = 'opacity 0.2s ease-in-out';
+            }, 0);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function removeImage() {
+        fileInput.value = '';
+        previewImage.src = '';
+        fileName.textContent = '';
+        
+        // Add fade-out effect
+        previewContainer.style.opacity = '0';
+        previewContainer.style.transition = 'opacity 0.2s ease-in-out';
+        
+        setTimeout(() => {
+            previewContainer.classList.add('hidden');
+            uploadInstructions.classList.remove('hidden');
+        }, 200);
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+</script>
+{% endblock %} 

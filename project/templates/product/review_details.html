@@ -1,0 +1,97 @@
+<div class="review-details">
+    <!-- Review Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div class="d-flex align-items-center">
+            {% if review.user.profile_image %}
+            <img src="{{ url_for('static', filename=review.user.profile_image) }}" 
+                 class="rounded-circle me-3" 
+                 width="48" 
+                 height="48"
+                 alt="{{ review.user.username }}"
+                 style="object-fit: cover;">
+            {% else %}
+            <div class="avatar-circle bg-primary-subtle text-primary me-3" 
+                 style="width: 48px; height: 48px; line-height: 48px; text-align: center; font-size: 20px;">
+                {{ review.user.username[:1].upper() }}
+            </div>
+            {% endif %}
+            <div>
+                <h6 class="mb-1">{{ review.user.username }}</h6>
+                <p class="text-muted mb-0">{{ review.created_at.strftime('%B %d, %Y') }}</p>
+            </div>
+        </div>
+        <div class="star-rating">
+            {% for i in range(review.rating) %}
+            <i class="fas fa-star"></i>
+            {% endfor %}
+            {% for i in range(5 - review.rating) %}
+            <i class="far fa-star"></i>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Review Content -->
+    <div class="review-content mb-4">
+        <p class="mb-0">{{ review.comment }}</p>
+    </div>
+
+    {% if review.seller_response %}
+    <!-- Seller Response -->
+    <div class="seller-response bg-light rounded p-3">
+        <div class="d-flex align-items-center mb-2">
+            <i class="fas fa-reply text-primary me-2"></i>
+            <h6 class="mb-0">Your Response</h6>
+            <small class="text-muted ms-auto">{{ review.response_date.strftime('%B %d, %Y') }}</small>
+        </div>
+        <p class="mb-0">{{ review.seller_response }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Product Info -->
+    <div class="product-info border-top mt-4 pt-4">
+        <div class="d-flex align-items-center">
+            <img src="{{ url_for('static', filename=product.image_main) }}" 
+                 class="rounded me-3" 
+                 width="60" 
+                 height="60"
+                 alt="{{ product.name }}"
+                 style="object-fit: cover;">
+            <div>
+                <h6 class="mb-1">{{ product.name }}</h6>
+                <p class="text-muted mb-0">Order #{{ review.order_id }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.review-details {
+    background: #fff;
+}
+
+.avatar-circle {
+    border-radius: 50%;
+}
+
+.star-rating {
+    color: #ffc107;
+}
+
+.star-rating .far {
+    color: #e4e5e7;
+}
+
+.seller-response {
+    position: relative;
+    margin-left: 2rem;
+}
+
+.seller-response::before {
+    content: '';
+    position: absolute;
+    left: -1rem;
+    top: 1rem;
+    border: 8px solid transparent;
+    border-right-color: #f8f9fa;
+}
+</style> 

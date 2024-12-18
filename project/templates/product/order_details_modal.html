@@ -1,0 +1,35 @@
+<div class="modal fade" id="orderDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Order Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="orderDetailsContent">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showOrderDetails(orderId) {
+    const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+    modal.show();
+    
+    fetch(`/seller/orders/${orderId}`)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('orderDetailsContent').innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('orderDetailsContent').innerHTML = 
+                '<div class="text-center text-danger">Error loading order details</div>';
+        });
+}
+</script> 

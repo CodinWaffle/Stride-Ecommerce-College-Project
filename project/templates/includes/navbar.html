@@ -1,0 +1,12 @@
+  <div class="dropdown-divider"></div>
+  {% if current_user.is_seller %}
+  <a class="dropdown-item" href="{{ url_for('product.seller_dashboard') }}">
+    <i class="ri-store-2-line me-2"></i>Seller Dashboard
+  </a>
+  {% else %}
+  <a class="dropdown-item" href="{{ url_for('auth.become_seller') }}">
+    <i class="ri-store-2-line me-2"></i>Become a Seller
+  </a>
+  {% endif %}
+  <div class="dropdown-divider"></div>
+  {% endif %} 
