@@ -85,9 +85,9 @@ def create_app():
     app.config['MAIL_PORT'] = 587
     app.config['MAIL_USE_TLS'] = True
     app.config['MAIL_USE_SSL'] = False
-    app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'dnxncpcx@gmail.com')
-    app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'oobq sbwa mrmi rcaa')
-    app.config['MAIL_DEFAULT_SENDER'] = ('Stride Support', os.environ.get('MAIL_USERNAME', 'dnxncpcx@gmail.com'))
+    app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'YourEmail')
+    app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'Your password')
+    app.config['MAIL_DEFAULT_SENDER'] = ('Stride Support', os.environ.get('MAIL_USERNAME', 'YourEmail'))
     app.config['MAIL_MAX_EMAILS'] = 50
     app.config['MAIL_ASCII_ATTACHMENTS'] = False
     app.config['MAIL_DEBUG'] = True
