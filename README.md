@@ -30,6 +30,7 @@ A comprehensive e-commerce platform built with Flask, featuring a robust seller 
   - Inventory tracking
   - Product performance metrics
 ![Seller Dashboard](https://github.com/user-attachments/assets/28001466-cd13-4e79-801b-a0368e68398a)
+![order management](https://github.com/user-attachments/assets/e5f5df85-ba46-4412-b79e-88e0ee7e012c)
 
 ## 4. Store Management
   - Customizable store profiles
