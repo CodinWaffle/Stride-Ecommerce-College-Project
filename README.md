@@ -21,16 +21,16 @@ A comprehensive e-commerce platform built with Flask, featuring a robust seller 
   - Inventory tracking
   - Category management
   - Featured product system
-![product management](https://github.com/user-attachments/assets/5ab41bc6-a6d3-4c18-b797-27ee7f668bc1)
-![manage categories](https://github.com/user-attachments/assets/b17385a2-3259-44e3-b04d-ae13f57701bb)
+![product management](https://github.com/user-attachments/assets/f8c5925e-4fa6-48be-a35e-9263fee50788)
+![manage categories](https://github.com/user-attachments/assets/0e93d35b-a150-44e8-b2b6-362773e0ae84)
 
 ## 3. Seller Dashboard
   - Sales analytics and reporting
   - Order management
   - Inventory tracking
   - Product performance metrics
-![Seller Dashboard](https://github.com/user-attachments/assets/28001466-cd13-4e79-801b-a0368e68398a)
-![order management](https://github.com/user-attachments/assets/e5f5df85-ba46-4412-b79e-88e0ee7e012c)
+![Seller Dashboard](https://github.com/user-attachments/assets/40c4fed9-3d52-4dd2-adc8-2278961718e5)
+![order management](https://github.com/user-attachments/assets/319fb467-d358-4510-9e4f-90163693a95c)
 
 ## 4. Store Management
   - Customizable store profiles
@@ -43,37 +43,37 @@ A comprehensive e-commerce platform built with Flask, featuring a robust seller 
   - Shopping cart functionality
   - Secure checkout process
   - Order tracking
-![Shop](https://github.com/user-attachments/assets/4a7c1b5d-4ef0-486a-bac9-9c0c040e5ef8)
-![order details](https://github.com/user-attachments/assets/748c5409-c4a9-4f2b-8cd4-f8fa9a8b9d5b)
-![orders](https://github.com/user-attachments/assets/8304da56-459c-43a4-8a3c-9676317fdde1)
+![Shop](https://github.com/user-attachments/assets/56d8531c-2e1a-41c5-8725-e0f4a1608ef6)
+![order details](https://github.com/user-attachments/assets/f8b9dcfc-f2ce-4a4d-ad6a-bcc4665fd0f7)
+![orders](https://github.com/user-attachments/assets/f491f5a8-499c-45d2-ac0f-fb8eee0d922b)
 
 ## 6. Product Details
   - Detailed product information
   - Image galleries
   - Size and variant selection
   - Stock availability
-![product details](https://github.com/user-attachments/assets/771993fa-1667-45ee-929c-340af24f70d4)
+![product details](https://github.com/user-attachments/assets/e95e5fb7-4a92-4d67-9fd4-ace318d80bda)
 
 ## 7. Review System
   - Product ratings and reviews
   - Media upload support
   - Seller responses
   - Rating analytics
-![review](https://github.com/user-attachments/assets/1343b5d4-6949-482a-bad4-0cdc01ddfd5c)
-![customer review](https://github.com/user-attachments/assets/9c098814-7477-4677-8265-353dddd7c951)
+![review](https://github.com/user-attachments/assets/2a8962ba-d048-4f82-bb2c-ab35967f296f)
+![customer review](https://github.com/user-attachments/assets/42511e67-bbc7-4d3d-9a2d-fb395d3db8fb)
 
 ## 8. Admin Panel
 - User management
 - Platform monitoring
 - Content moderation
 - System settings
-![users_admin](https://github.com/user-attachments/assets/5fcbff5a-eeb7-428b-a384-ff5ff305dcf6)
+![users_admin](https://github.com/user-attachments/assets/f6320ecc-2e66-46bf-b01c-2be004512f59)
 
-![Admin_dashboard](https://github.com/user-attachments/assets/64efe581-d601-4a99-af68-85a89e161ee0)
+![Admin_dashboard](https://github.com/user-attachments/assets/8402cef7-24aa-4745-9a1d-70ddfa9cf596)
 
-![admin_products](https://github.com/user-attachments/assets/dbe7d7e4-b092-452a-8a94-65eba8c24023)
+![admin_products](https://github.com/user-attachments/assets/8d589e0b-9f3a-47fb-83f0-82214e157eab)
 
-![admin_orders](https://github.com/user-attachments/assets/c62e357a-067b-4cd3-94df-2c4b3ac95313)
+![admin_orders](https://github.com/user-attachments/assets/d6865781-82c7-4c94-9cf9-acbfe1082443)
 
 
 ## Installation
