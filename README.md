@@ -74,23 +74,3 @@ A comprehensive e-commerce platform built with Flask, featuring a robust seller 
 ![admin_products](https://github.com/user-attachments/assets/8d589e0b-9f3a-47fb-83f0-82214e157eab)
 
 ![admin_orders](https://github.com/user-attachments/assets/d6865781-82c7-4c94-9cf9-acbfe1082443)
-
-
-## Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/CodinWaffle/Stride.git
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Set up environment variables
-cp .env.example .env
-
-# Initialize the database
-flask db upgrade
-
-# Run the application
-flask run
-```
